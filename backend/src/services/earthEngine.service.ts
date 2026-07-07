@@ -114,18 +114,27 @@ export const EarthEngineService = {
 
     } catch (error: any) {
       logger.error('Google Earth Engine API request failed. Using fallback data:', error.message);
-      return getMockSatelliteData();
+      return getMockSatelliteData(lat, lng);
     }
   }
 };
 
-function getMockSatelliteData() {
+function getMockSatelliteData(lat: number, lng: number) {
+  // Generate a live satellite image from ESRI World Imagery using a bounding box
+  const offset = 0.05; // ~5km radius
+  const minLng = (lng - offset).toFixed(4);
+  const minLat = (lat - offset).toFixed(4);
+  const maxLng = (lng + offset).toFixed(4);
+  const maxLat = (lat + offset).toFixed(4);
+  
+  const esriUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${minLng},${minLat},${maxLng},${maxLat}&bboxSR=4326&imageSR=4326&size=800,800&format=jpg&f=image`;
+
   return {
     ndvi: (Math.random() * 0.5 + 0.2).toFixed(2), // 0.2 to 0.7
     fireHotspots: Math.random() > 0.8 ? Math.floor(Math.random() * 3) + 1 : 0, 
     landCover: "Urban/Built-up",
     vegetationHealth: "Moderate",
     elevation: Math.floor(Math.random() * 400 + 10) + "m",
-    thumbUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'
+    thumbUrl: esriUrl
   };
 }
