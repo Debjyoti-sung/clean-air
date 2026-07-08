@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Maximize2, UserPlus, CheckCircle2, CircleDashed } from 'lucide-react';
+import { Maximize2, CheckCircle2, CircleDashed } from 'lucide-react';
 
 export default function ReportsTable({ reports, onExpand }) {
   
@@ -68,12 +68,6 @@ export default function ReportsTable({ reports, onExpand }) {
               </td>
               <td className="py-4 px-6">
                 <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-2 text-slate-455 hover:text-blue-650 hover:bg-white rounded-xl transition shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] bg-[#f1f5f9] border border-white/20" title="Quick View">
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-slate-455 hover:text-purple-650 hover:bg-white rounded-xl transition shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] bg-[#f1f5f9] border border-white/20" title="Assign Officer">
-                    <UserPlus className="w-4 h-4" />
-                  </button>
                   <button 
                     onClick={() => onExpand(report)}
                     className="p-2 text-slate-650 hover:text-[#15803D] hover:bg-white rounded-xl transition shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] bg-[#f1f5f9] border border-white/20" 
