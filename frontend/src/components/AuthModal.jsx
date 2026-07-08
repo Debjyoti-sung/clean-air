@@ -159,7 +159,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin', onA
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-[#f1f5f9] border border-slate-200 focus:border-emerald-500 rounded-2xl pl-11 pr-4 py-3.5 text-slate-900 font-bold text-sm focus:outline-none transition shadow-[inset_2px_2px_5px_#cbd5e1,inset_-2px_-2px_5px_#ffffff]" 
-                placeholder="citizen@AerioN.org" 
+                placeholder="citizen@AERION.org" 
               />
             </div>
           </div>

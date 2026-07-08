@@ -1,7 +1,7 @@
 import React from 'react';
 import { Focus, Cpu, Landmark } from 'lucide-react';
 
-export default function WhyAerioN({ language }) {
+export default function WhyAERION({ language }) {
   const points = [
     {
       title: language === 'EN' ? 'Hyperlocal Detection' : 'हाइपरलोकल ट्रैकिंग',
@@ -37,7 +37,7 @@ export default function WhyAerioN({ language }) {
         {/* Headings */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <h2 className="text-[34px] md:text-[42px] font-black text-slate-900 tracking-tight leading-tight">
-            {language === 'EN' ? 'Why AerioN?' : 'AerioN क्यों चुनें?'}
+            {language === 'EN' ? 'Why AERION?' : 'AERION क्यों चुनें?'}
           </h2>
           <p className="text-[16.5px] text-slate-500 font-semibold leading-relaxed">
             {language === 'EN'

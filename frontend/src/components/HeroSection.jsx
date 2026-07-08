@@ -185,7 +185,7 @@ export default function HeroSection({
         ? "Restoring Green Cover and Renewable Energy."
         : "हरित आवरण और नवीकरणीय ऊर्जा को पुनर्स्थापित करना।",
       subtitle: language === 'EN'
-        ? "Fostering sustainable urban forestry and monitoring clean wind/solar energy outputs to ensure AerioN and lower industrial carbon footprint."
+        ? "Fostering sustainable urban forestry and monitoring clean wind/solar energy outputs to ensure AERION and lower industrial carbon footprint."
         : "स्वच्छ हवा और कम औद्योगिक कार्बन फुटप्रिंट सुनिश्चित करने के लिए टिकाऊ शहरी वानिकी को बढ़ावा देना और स्वच्छ पवन/सौर ऊर्जा आउटपुट की निगरानी करना।"
     },
     {

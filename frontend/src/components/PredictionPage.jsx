@@ -913,7 +913,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                   <Brain className="w-5 h-5 text-[#15803D]" />
                   <span>{t.whyAIPredicted} ({t.title})</span>
                 </h3>
-                <p className="text-[12.5px] text-slate-400 font-medium">Environmental correlation analysis representing atmospheric dependencies mapped by AerioN neural weights.</p>
+                <p className="text-[12.5px] text-slate-400 font-medium">Environmental correlation analysis representing atmospheric dependencies mapped by AERION neural weights.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

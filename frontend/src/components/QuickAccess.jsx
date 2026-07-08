@@ -85,7 +85,7 @@ export default function QuickAccess({ onReportClick, language }) {
               {language === 'EN' ? 'Quick Access Services' : 'त्वरित पहुंच सेवाएं'}
             </h2>
             <p className="text-[16.5px] text-slate-500 font-semibold max-w-2xl leading-relaxed">
-              {language === 'EN' ? 'Navigate to AerioN modules instantly with our optimized digital infrastructure.' : 'हमारे अनुकूलित डिजिटल बुनियादी ढांचे के साथ तुरंत क्लीनएयर मॉड्यूल पर नेविगेट करें।'}
+              {language === 'EN' ? 'Navigate to AERION modules instantly with our optimized digital infrastructure.' : 'हमारे अनुकूलित डिजिटल बुनियादी ढांचे के साथ तुरंत क्लीनएयर मॉड्यूल पर नेविगेट करें।'}
             </p>
           </div>
           

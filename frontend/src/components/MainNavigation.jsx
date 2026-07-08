@@ -62,12 +62,10 @@ export default function MainNavigation({ onSearchClick, onReportClick, language,
         {/* Left: Brand Logo */}
         <div className="flex flex-col select-none cursor-pointer group" onClick={() => { setCurrentPage('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1] flex items-center justify-center text-lg group-hover:shadow-[inset_2px_2px_5px_#cbd5e1] transition-all duration-300">
-              <img src={logo} alt="AerioN Logo" className="w-6 h-6 object-contain" />
-            </div>
+            <img src={logo} alt="AERION Logo" className="w-12 h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col">
-              <span className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
-                AerioN
+              <span className="text-[22px] font-black text-slate-800 tracking-tight leading-none uppercase">
+                AERION
               </span>
               <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">
                 {language === 'EN' ? 'Intelligence' : 'खुफिया प्रणाली'}

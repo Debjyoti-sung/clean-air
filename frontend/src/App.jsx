@@ -25,7 +25,7 @@ import LivePollution from './components/LivePollution';
 import PlatformOverview from './components/PlatformOverview';
 import AIWorkflow from './components/AIWorkflow';
 
-import WhyAerioN from './components/WhyAerioN';
+import WhyAERION from './components/WhyAERION';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import LocationModal from './components/LocationModal';
@@ -223,7 +223,7 @@ export default function App() {
     {
       question: language === 'EN' ? 'How does the AI vision filter out duplicate or fake reports?' : 'एआई नकली या डुप्लिकेट रिपोर्ट को कैसे फ़िल्टर करता है?',
       answer: language === 'EN'
-        ? 'AerioN processes submissions using space-based temporal verification. When a citizen uploads an incident image, the system cross-references the coordinate grid against nearby active static sensors and weather vectors to confirm the particulate dispersion signature. Multiple uploads within 50 meters are automatically merged into a single ticket.'
+        ? 'AERION processes submissions using space-based temporal verification. When a citizen uploads an incident image, the system cross-references the coordinate grid against nearby active static sensors and weather vectors to confirm the particulate dispersion signature. Multiple uploads within 50 meters are automatically merged into a single ticket.'
         : 'क्राउडसोर्स रिपोर्ट को आसपास के सक्रिय भौतिक सेंसर और इनसैट उपग्रह डेटा के साथ मिलाया जाता है। एक ही स्थान से कई रिपोर्टों को स्वचालित रूप से एक टिकट में विलय कर दिया जाता है।'
     },
     {
@@ -309,8 +309,8 @@ export default function App() {
 
 
 
-          {/* 10. WHY AerioN */}
-          <WhyAerioN
+          {/* 10. WHY AERION */}
+          <WhyAERION
             language={language}
           />
 
@@ -319,7 +319,7 @@ export default function App() {
             <div className="max-w-3xl mx-auto space-y-8">
               <div className="text-center space-y-2">
                 <h2 className="text-[32px] font-bold text-slate-900 tracking-tight">Citizen Grievance Redressal</h2>
-                <p className="text-[16px] text-slate-500 font-medium">How the AerioN portal connects public alerts with local authorities.</p>
+                <p className="text-[16px] text-slate-500 font-medium">How the AERION portal connects public alerts with local authorities.</p>
               </div>
 
               <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm divide-y divide-slate-200">
