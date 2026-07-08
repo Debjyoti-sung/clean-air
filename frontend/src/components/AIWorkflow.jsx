@@ -7,9 +7,7 @@ import {
   ShieldCheck, 
   Globe, 
   Users, 
-  CheckCircle,
-  ArrowRight,
-  ArrowDown
+  CheckCircle
 } from 'lucide-react';
 
 export default function AIWorkflow({ language }) {
@@ -19,56 +17,64 @@ export default function AIWorkflow({ language }) {
       title: language === 'EN' ? 'Citizen Upload' : 'नागरिक अपलोड',
       desc: language === 'EN' ? 'Photo & geolocation submitted.' : 'फोटो और जीपीएस स्थान दर्ज।',
       icon: Camera,
-      color: 'bg-blue-50 text-blue-600 border-blue-100 hover:border-blue-400'
+      color: 'text-blue-600 border-blue-200 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.15)]',
+      stepNumColor: 'text-blue-655 bg-blue-50 border-blue-100'
     },
     {
       id: 2,
       title: language === 'EN' ? 'AI Vision' : 'एआई विजन',
       desc: language === 'EN' ? 'Vision identifies category.' : 'श्रेणी की पहचान की जाती है।',
       icon: Eye,
-      color: 'bg-purple-50 text-purple-600 border-purple-100 hover:border-purple-400'
+      color: 'text-purple-600 border-purple-205 hover:border-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.15)]',
+      stepNumColor: 'text-purple-655 bg-purple-50 border-purple-100'
     },
     {
       id: 3,
       title: language === 'EN' ? 'Weather' : 'मौसम एकीकरण',
       desc: language === 'EN' ? 'Integrates wind & direction.' : 'हवा और दिशा का एकीकरण।',
       icon: CloudSun,
-      color: 'bg-amber-50 text-amber-600 border-amber-100 hover:border-amber-400'
+      color: 'text-amber-600 border-amber-205 hover:border-amber-500 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]',
+      stepNumColor: 'text-amber-655 bg-amber-50 border-amber-100'
     },
     {
       id: 4,
       title: language === 'EN' ? 'Satellite' : 'उपग्रह मिलान',
       desc: language === 'EN' ? 'Cross-checked with INSAT.' : 'इनसैट डेटा से तुलना।',
       icon: Orbit,
-      color: 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:border-indigo-400'
+      color: 'text-indigo-600 border-indigo-205 hover:border-indigo-500 hover:shadow-[0_0_15px_rgba(79,70,229,0.15)]',
+      stepNumColor: 'text-indigo-655 bg-indigo-50 border-indigo-100'
     },
     {
       id: 5,
       title: language === 'EN' ? 'Confidence' : 'आत्मविश्वास स्तर',
       desc: language === 'EN' ? 'Scored for verification.' : 'सत्यापन स्कोर की गणना।',
       icon: ShieldCheck,
-      color: 'bg-rose-50 text-rose-600 border-rose-100 hover:border-rose-400'
+      color: 'text-rose-600 border-rose-205 hover:border-rose-500 hover:shadow-[0_0_15px_rgba(225,29,72,0.15)]',
+      stepNumColor: 'text-rose-655 bg-rose-50 border-rose-100'
     },
     {
       id: 6,
       title: language === 'EN' ? 'Published' : 'प्रकाशित हॉटस्पॉट',
       desc: language === 'EN' ? 'Hotspot mapped on portal.' : 'नक्शे पर हॉटस्पॉट शामिल।',
       icon: Globe,
-      color: 'bg-cyan-50 text-cyan-600 border-cyan-100 hover:border-cyan-400'
+      color: 'text-cyan-600 border-cyan-205 hover:border-cyan-500 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)]',
+      stepNumColor: 'text-cyan-655 bg-cyan-50 border-cyan-100'
     },
     {
       id: 7,
       title: language === 'EN' ? 'Assignment' : 'विभाग आवंटन',
       desc: language === 'EN' ? 'Dispatched to ward officer.' : 'वार्ड अधिकारी को निर्देशित।',
       icon: Users,
-      color: 'bg-slate-50 text-slate-600 border-slate-250 hover:border-slate-400'
+      color: 'text-slate-600 border-slate-300 hover:border-slate-500 hover:shadow-[0_0_15px_rgba(71,85,105,0.15)]',
+      stepNumColor: 'text-slate-655 bg-slate-100 border-slate-200'
     },
     {
       id: 8,
       title: language === 'EN' ? 'Resolved' : 'समस्या का निवारण',
       desc: language === 'EN' ? 'Municipal team closes log.' : 'वार्ड टीम द्वारा लॉग बंद।',
       icon: CheckCircle,
-      color: 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:border-emerald-400'
+      color: 'text-emerald-600 border-emerald-205 hover:border-emerald-500 hover:shadow-[0_0_15px_rgba(16,185,129,0.15)]',
+      stepNumColor: 'text-emerald-655 bg-emerald-50 border-emerald-100'
     }
   ];
 
@@ -88,67 +94,70 @@ export default function AIWorkflow({ language }) {
         </div>
 
         {/* Responsive Ingest Steps Timeline */}
-        <div className="w-full">
+        <div className="w-full relative">
+          
           {/* Horizontal Layout for Desktop (lg and up) */}
-          <div className="hidden lg:flex items-center justify-between w-full relative">
-            {steps.map((step, idx) => {
+          <div className="hidden lg:flex items-start justify-between w-full relative z-10 py-6">
+            
+            {/* Connecting Continuous Line behind bubbles */}
+            <div className="absolute top-[52px] left-[6%] right-[6%] h-[3px] bg-gradient-to-r from-blue-400 via-purple-400 via-indigo-400 via-rose-400 to-emerald-400 rounded-full opacity-40 z-0" />
+
+            {steps.map((step) => {
               const Icon = step.icon;
-              const isLast = idx === steps.length - 1;
 
               return (
-                <React.Fragment key={step.id}>
-                  {/* Step bubble */}
-                  <div className="flex flex-col items-center text-center space-y-3 flex-1 relative px-2">
+                <div key={step.id} className="flex flex-col items-center text-center space-y-4 flex-1 relative px-2 z-10">
+                  {/* Step Bubble with Badge */}
+                  <div className="relative">
                     <div 
-                      className={`w-14 h-14 rounded-full flex items-center justify-center border-2 shadow-sm transition-all duration-200 cursor-pointer ${step.color}`}
+                      className={`w-14 h-14 rounded-full bg-white flex items-center justify-center border-2 shadow-sm transition-all duration-300 hover:scale-110 cursor-pointer ${step.color}`}
                       title={step.title}
                     >
                       <Icon className="w-6 h-6 stroke-[1.8]" />
                     </div>
-                    <div className="space-y-0.5">
-                      <h4 className="text-[15px] font-bold text-slate-900 tracking-tight">
-                        {step.title}
-                      </h4>
-                      <p className="text-[11.5px] text-slate-500 max-w-[120px] mx-auto leading-normal">
-                        {step.desc}
-                      </p>
-                    </div>
+                    
+                    {/* Step Number Badge */}
+                    <span className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black border border-slate-200/60 shadow-sm ${step.stepNumColor}`}>
+                      0{step.id}
+                    </span>
                   </div>
 
-                  {/* Connecting Arrow */}
-                  {!isLast && (
-                    <div className="flex items-center justify-center shrink-0 w-8">
-                      <ArrowRight className="w-5 h-5 text-slate-300 animate-pulse stroke-[2.5]" />
-                    </div>
-                  )}
-                </React.Fragment>
+                  <div className="space-y-1">
+                    <h4 className="text-[15px] font-bold text-slate-900 tracking-tight">
+                      {step.title}
+                    </h4>
+                    <p className="text-[11.5px] text-slate-500 max-w-[125px] mx-auto leading-normal">
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
               );
             })}
           </div>
 
           {/* Vertical Layout for Mobile/Tablet (less than lg) */}
-          <div className="flex lg:hidden flex-col items-center space-y-4 max-w-sm mx-auto">
-            {steps.map((step, idx) => {
+          <div className="flex lg:hidden flex-col items-stretch space-y-5 max-w-md mx-auto relative px-4 z-10">
+            {/* Connecting Vertical Line behind bubbles */}
+            <div className="absolute top-4 bottom-4 left-[38px] w-[3px] bg-gradient-to-b from-blue-400 via-purple-400 via-indigo-400 via-rose-400 to-emerald-400 rounded-full opacity-40 z-0" />
+
+            {steps.map((step) => {
               const Icon = step.icon;
-              const isLast = idx === steps.length - 1;
 
               return (
-                <React.Fragment key={step.id}>
-                  <div className="w-full flex items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-x-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 shrink-0 ${step.color}`}>
+                <div key={step.id} className="relative z-10 flex items-center space-x-5 bg-white/80 backdrop-blur-xl p-4.5 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.05)] transition-all duration-300">
+                  <div className="relative shrink-0">
+                    <div className={`w-12 h-12 rounded-full bg-white flex items-center justify-center border-2 ${step.color}`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div className="text-left space-y-0.5">
-                      <span className="text-[12px] font-extrabold uppercase text-slate-400 tracking-wider">Step {step.id}</span>
-                      <h4 className="text-[15px] font-bold text-slate-900">{step.title}</h4>
-                      <p className="text-[12px] text-slate-500">{step.desc}</p>
-                    </div>
+                    <span className={`absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full flex items-center justify-center text-[8px] font-black border border-slate-200/60 shadow-sm ${step.stepNumColor}`}>
+                      0{step.id}
+                    </span>
                   </div>
-
-                  {!isLast && (
-                    <ArrowDown className="w-5 h-5 text-slate-300 animate-pulse my-1 stroke-[2.5]" />
-                  )}
-                </React.Fragment>
+                  <div className="text-left space-y-0.5">
+                    <h4 className="text-[15px] font-bold text-slate-800 tracking-tight">{step.title}</h4>
+                    <p className="text-[12.5px] text-slate-500 leading-normal">{step.desc}</p>
+                  </div>
+                </div>
               );
             })}
           </div>

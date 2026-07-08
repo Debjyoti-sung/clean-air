@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Mail, Loader2, Check, UserPlus, LogIn, AlertCircle } from 'lucide-react';
+import { Lock, Mail, Loader2, Check, UserPlus, LogIn, AlertCircle, Phone } from 'lucide-react';
 import { SupabaseService } from '../../services/supabase.service';
 
 export default function AuthPromptCard({ user, onAuthenticated }) {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,8 +31,12 @@ export default function AuthPromptCard({ user, onAuthenticated }) {
     setError('');
     try {
       if (isSignUp) {
-        const u = await SupabaseService.signUp(email, password);
-        alert("Registration successful! Please confirm your email if verification is required.");
+        const u = await SupabaseService.signUp(email, password, {
+          name,
+          phone,
+          avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`
+        });
+        alert("Registration successful!");
         onAuthenticated(u);
       } else {
         const u = await SupabaseService.signIn(email, password);
@@ -96,6 +102,42 @@ export default function AuthPromptCard({ user, onAuthenticated }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+          {isSignUp && (
+            <>
+              <div>
+                <label className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider ml-1">Full Name</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none">
+                    <UserPlus className="w-4 h-4" />
+                  </span>
+                  <input 
+                    type="text" 
+                    required
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="w-full bg-[#f1f5f9] border border-slate-200 focus:border-emerald-500 rounded-2xl pl-11 pr-4 py-3.5 text-slate-900 font-bold text-sm focus:outline-none transition shadow-[inset_2px_2px_5px_#cbd5e1,inset_-2px_-2px_5px_#ffffff]" 
+                    placeholder="John Doe" 
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider ml-1">Phone Number</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none">
+                    <Phone className="w-4 h-4" />
+                  </span>
+                  <input 
+                    type="tel" 
+                    required
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    className="w-full bg-[#f1f5f9] border border-slate-200 focus:border-emerald-500 rounded-2xl pl-11 pr-4 py-3.5 text-slate-900 font-bold text-sm focus:outline-none transition shadow-[inset_2px_2px_5px_#cbd5e1,inset_-2px_-2px_5px_#ffffff]" 
+                    placeholder="+91 9876543210" 
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <div>
             <label className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider ml-1">Email</label>
             <div className="relative">

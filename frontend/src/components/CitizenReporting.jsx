@@ -13,6 +13,7 @@ import SuccessCard from './CitizenReporting/SuccessCard';
 import { SupabaseService } from '../services/supabase.service';
 import { EmailService } from '../services/email.service';
 import { useEffect } from 'react';
+import { mockReports } from './Municipality/mockData';
 
 export default function CitizenReporting({ language = 'EN', onBack, user, onUserChange }) {
   const [step, setStep] = useState(1);
@@ -55,11 +56,41 @@ export default function CitizenReporting({ language = 'EN', onBack, user, onUser
       
       const res = await SupabaseService.submitReport(reportData);
       
-      setReportData(prev => ({ ...prev, trackingId: res.trackingId }));
+      const trackingId = res.trackingId || `CIT-${Math.floor(Math.random() * 90000) + 10000}`;
+      
+      const newReport = {
+        id: trackingId,
+        citizenName: reportData.user?.user_metadata?.name || reportData.user?.user_metadata?.full_name || reportData.user?.email?.split('@')[0] || "Citizen",
+        citizenEmail: reportData.user?.email || "citizen@cleanair.org",
+        contactNumber: reportData.user?.user_metadata?.phone || "+91 99999 99999",
+        issueCategory: reportData.analysis?.category || "Ambient Air Quality",
+        priority: reportData.analysis?.severity === 'critical' ? 'Critical' : (reportData.analysis?.severity === 'high' ? 'High' : 'Moderate'),
+        severity: reportData.analysis?.severity === 'critical' ? 'High' : (reportData.analysis?.severity === 'high' ? 'High' : 'Moderate'),
+        location: reportData.location?.address ? reportData.location.address.split('\n')[0] : "Reported Location",
+        wardNumber: "Ward 45",
+        submittedDate: new Date().toISOString(),
+        currentStatus: "New",
+        assignedOfficer: null,
+        deadline: new Date(Date.now() + 86400000 * 2).toISOString(),
+        description: reportData.notes || "No description provided.",
+        images: reportData.image ? [reportData.image] : [],
+        aiSummary: {
+          pollutionType: reportData.analysis?.category || "Visual Plume Signature",
+          impactScore: reportData.analysis?.confidence || 85,
+          explanation: reportData.analysis?.verification || "AI Verified plume boundaries.",
+          nearbySensitiveAreas: ["Residential Zone (50m)"]
+        },
+        aiResolutionPlan: null,
+        resourceRequest: null
+      };
+
+      mockReports.unshift(newReport);
+      
+      setReportData(prev => ({ ...prev, trackingId: trackingId }));
       
       // Simulate sending confirmation email
       if (reportData.user?.email) {
-        await EmailService.sendConfirmation(reportData.user.email, { trackingId: res.trackingId });
+        await EmailService.sendConfirmation(reportData.user.email, { trackingId: trackingId });
       }
       
       nextStep(); // Go to step 10 (Success)
@@ -123,7 +154,7 @@ export default function CitizenReporting({ language = 'EN', onBack, user, onUser
           </div>
         );
       case 10:
-        return <SuccessCard trackingId={reportData.trackingId} />;
+        return <SuccessCard trackingId={reportData.trackingId} reportData={reportData} />;
       default:
         return null;
     }

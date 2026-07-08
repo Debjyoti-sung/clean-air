@@ -112,8 +112,8 @@ export default function MainNavigation({ onSearchClick, onReportClick, language,
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1] active:shadow-[inset_2px_2px_5px_#cbd5e1] transition-all duration-300 cursor-pointer overflow-hidden border-2 border-emerald-100"
               >
-                {user?.user_metadata?.avatar_url ? (
-                  <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                {(user?.user_metadata?.avatar_url || user?.user_metadata?.picture) ? (
+                  <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-emerald-700 font-bold text-lg uppercase">
                     {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || '?').charAt(0)}
@@ -125,8 +125,8 @@ export default function MainNavigation({ onSearchClick, onReportClick, language,
                 <div className="absolute top-14 right-0 w-64 bg-[#f1f5f9] rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.15)] p-5 border border-slate-200 animate-fadeIn z-50">
                   <div className="flex flex-col items-center pb-4 mb-4 border-b border-slate-200/60 text-center">
                     <div className="w-16 h-16 rounded-full overflow-hidden shadow-[4px_4px_8px_#cbd5e1] mb-3 bg-white">
-                      {user?.user_metadata?.avatar_url ? (
-                        <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                      {(user?.user_metadata?.avatar_url || user?.user_metadata?.picture) ? (
+                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-emerald-700 font-bold text-2xl uppercase">
                            {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || '?').charAt(0)}
@@ -214,8 +214,8 @@ export default function MainNavigation({ onSearchClick, onReportClick, language,
             {user ? (
               <div className="flex flex-col space-y-4 bg-[#f1f5f9] shadow-[inset_4px_4px_8px_#cbd5e1] p-4 rounded-3xl items-center">
                 <div className="w-16 h-16 rounded-full overflow-hidden shadow-[4px_4px_8px_#cbd5e1] bg-white mt-2">
-                  {user?.user_metadata?.avatar_url ? (
-                    <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  {(user?.user_metadata?.avatar_url || user?.user_metadata?.picture) ? (
+                    <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-emerald-700 font-bold text-2xl uppercase">
                        {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || '?').charAt(0)}

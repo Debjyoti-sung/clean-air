@@ -73,7 +73,7 @@ export default function MunicipalityTopNav({ onBack, user, setActiveTab }) {
               <span className="text-[11px] font-bold text-slate-400">NDMC Division</span>
             </div>
             <div className="w-11 h-11 rounded-full bg-[#f1f5f9] overflow-hidden border-2 border-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1] group-hover:shadow-[inset_2px_2px_5px_#cbd5e1] transition-all">
-              <img src={user?.user_metadata?.avatar_url || "https://api.dicebear.com/7.x/notionists/svg?seed=Felix"} alt="Profile" className="w-full h-full object-cover" />
+              <img src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || "https://api.dicebear.com/7.x/notionists/svg?seed=Felix"} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
           </div>

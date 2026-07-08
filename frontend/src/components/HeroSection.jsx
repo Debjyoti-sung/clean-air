@@ -254,6 +254,14 @@ export default function HeroSection({
     const state = selectedLocation.state;
     const dist = selectedLocation.district;
     
+    if (city === 'GPS Location' || !city) {
+      const lat = parseFloat(selectedLocation.latitude);
+      const lng = parseFloat(selectedLocation.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        return `📍 ${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`;
+      }
+    }
+    
     if (city) {
       if (state) {
         return `📍 ${city}, ${state}`;

@@ -7,8 +7,7 @@ import {
   TrendingUp,
   Building2,
   BarChart3,
-  KeyRound,
-  ArrowRight
+  KeyRound
 } from 'lucide-react';
 
 export default function QuickAccess({ onReportClick, language }) {
@@ -96,9 +95,9 @@ export default function QuickAccess({ onReportClick, language }) {
           </div>
         </div>
 
-        {/* 7-Card Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 relative z-10">
-          {services.map((item, idx) => {
+        {/* Render Card helper function */}
+        {(() => {
+          const renderCard = (item, idx, extraClass = '') => {
             const Icon = item.icon;
             const handleClick = (e) => {
               if (item.action === 'report') {
@@ -112,7 +111,7 @@ export default function QuickAccess({ onReportClick, language }) {
                 key={idx}
                 href={item.link || '#'}
                 onClick={item.action === 'report' ? handleClick : undefined}
-                className="group relative overflow-hidden flex flex-col justify-between p-7 bg-white/80 backdrop-blur-xl rounded-[1.5rem] border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer h-full"
+                className={`group relative overflow-hidden flex flex-col justify-between p-7 bg-white/80 backdrop-blur-xl rounded-[1.5rem] border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer ${extraClass}`}
               >
                 {/* Decorative Hover Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -133,20 +132,26 @@ export default function QuickAccess({ onReportClick, language }) {
                     </p>
                   </div>
                 </div>
-
-                {/* Arrow Action Indicator */}
-                <div className="relative z-10 flex items-center justify-between mt-8 pt-5 border-t border-slate-100 group-hover:border-slate-200 transition-colors">
-                  <span className="text-[13px] font-black text-slate-400 group-hover:text-slate-700 transition-colors uppercase tracking-widest">
-                    {language === 'EN' ? 'Explore' : 'अन्वेषण करें'}
-                  </span>
-                  <div className="w-9 h-9 rounded-full bg-slate-50 group-hover:bg-slate-900 flex items-center justify-center transition-colors duration-300 shadow-sm">
-                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white transform group-hover:translate-x-0.5 transition-all duration-300" />
-                  </div>
-                </div>
               </a>
             );
-          })}
-        </div>
+          };
+
+          return (
+            <div className="space-y-6 md:space-y-7 relative z-10">
+              {/* Top Row: 4 Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+                {services.slice(0, 4).map((item, idx) => renderCard(item, idx, 'h-full'))}
+              </div>
+
+              {/* Bottom Row: 3 Cards Centered */}
+              <div className="flex flex-col sm:flex-row justify-center items-stretch flex-wrap gap-6 md:gap-7">
+                {services.slice(4, 7).map((item, idx) => 
+                  renderCard(item, idx + 4, 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-21px)] max-w-[340px]')
+                )}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </section>
   );

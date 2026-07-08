@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, Download, UserPlus, Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ReportsTable from './ReportsTable';
 import ReportDrawer from './ReportDrawer';
 import { mockReports } from './mockData';
@@ -27,21 +27,7 @@ export default function CitizenReportsView() {
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Citizen Reports Hub</h1>
           <p className="text-[15px] font-medium text-slate-500 mt-1 max-w-xl">Manage, verify, and route public environmental grievances to field operations.</p>
         </div>
-        
-        <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 px-5 py-2.5 bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] active:shadow-[inset_2px_2px_4px_#cbd5e1] border border-white/40 rounded-xl text-[13px] font-bold text-slate-700 hover:text-slate-900 transition-all">
-            <SlidersHorizontal className="w-4 h-4 text-slate-450" />
-            <span>Filters</span>
-          </button>
-          <button className="flex items-center space-x-2 px-5 py-2.5 bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] active:shadow-[inset_2px_2px_4px_#cbd5e1] border border-white/40 rounded-xl text-[13px] font-bold text-slate-700 hover:text-slate-900 transition-all">
-            <Download className="w-4 h-4 text-slate-450" />
-            <span>Export</span>
-          </button>
-          <button className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-b from-[#15803D] to-[#166534] rounded-xl text-[13px] font-black text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)]">
-            <UserPlus className="w-4 h-4 text-emerald-100" />
-            <span>Auto Dispatch</span>
-          </button>
-        </div>
+
       </div>
 
       {/* Analytics Mini-Cards (Neumorphic Flat Cards) */}

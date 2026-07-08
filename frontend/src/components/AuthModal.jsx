@@ -62,9 +62,10 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin', onA
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-xl transition cursor-pointer"
+          className="absolute top-6 right-6 p-2 text-slate-600 hover:text-slate-950 bg-slate-200/60 hover:bg-slate-200 rounded-full transition-all cursor-pointer z-50 shadow-sm"
+          aria-label="Close"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4 stroke-[2.5]" />
         </button>
 
         {/* Header Icon */}

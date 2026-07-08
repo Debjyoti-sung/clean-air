@@ -80,7 +80,7 @@ export function AssignedTasksView() {
               </div>
               <button 
                 onClick={() => handleExpand(report)}
-                className="px-4 py-2 bg-slate-850 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition cursor-pointer"
               >
                 Inspect
               </button>
