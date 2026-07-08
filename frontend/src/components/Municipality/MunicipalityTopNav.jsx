@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, Activity, Settings, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Search, Bell, ChevronDown, Activity, Settings, User, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 
-export default function MunicipalityTopNav({ onBack, user, setActiveTab }) {
+export default function MunicipalityTopNav({ onBack, user, setActiveTab, isSidebarOpen, toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
 
@@ -15,11 +15,17 @@ export default function MunicipalityTopNav({ onBack, user, setActiveTab }) {
   };
 
   return (
-    <header className="h-[88px] bg-[#f1f5f9] border-b border-slate-200 sticky top-0 z-30 px-10 flex items-center justify-between text-slate-800">
-      <div className="flex items-center space-x-8 w-1/2">
+    <header className="h-[88px] bg-[#f1f5f9] border-b border-slate-200 sticky top-0 z-30 px-6 md:px-10 flex items-center justify-between text-slate-800">
+      <div className="flex items-center space-x-4 md:space-x-8 w-1/2">
+        <button 
+          onClick={toggleSidebar}
+          className="p-2 rounded-full hover:bg-slate-200 text-slate-500 transition cursor-pointer flex-shrink-0"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         <button 
           onClick={onBack}
-          className="text-[13px] font-extrabold uppercase tracking-widest text-[#15803D] hover:text-[#166534] transition-colors flex items-center space-x-2 group cursor-pointer"
+          className="text-[13px] font-extrabold uppercase tracking-widest text-[#15803D] hover:text-[#166534] transition-colors hidden sm:flex items-center space-x-2 group cursor-pointer flex-shrink-0"
         >
           <span className="text-lg group-hover:-translate-x-1 transition-transform">&larr;</span> 
           <span>Portal</span>

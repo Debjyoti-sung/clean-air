@@ -12,7 +12,7 @@ import {
   Settings 
 } from 'lucide-react';
 
-export default function MunicipalitySidebar({ activeTab, setActiveTab }) {
+export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen }) {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
     { name: 'Citizen Reports', icon: FileWarning },
@@ -26,7 +26,7 @@ export default function MunicipalitySidebar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <aside className="w-72 bg-[#f1f5f9] h-screen fixed left-0 top-0 flex flex-col z-40 border-r border-slate-300/40 px-5 py-6">
+    <aside className={`w-72 bg-[#f1f5f9] h-screen fixed left-0 top-0 flex flex-col z-40 border-r border-slate-300/40 px-5 py-6 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       
       {/* Brand Logo Header */}
       <div className="flex items-center space-x-3 mb-8 px-3">
