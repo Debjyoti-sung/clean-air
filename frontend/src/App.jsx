@@ -42,7 +42,13 @@ export default function App() {
   const [language, setLanguage] = useState('EN'); // EN, HI
   const [isDarkMode, setIsDarkMode] = useState(false); // High Contrast mode
   const [selectedLocation, setSelectedLocation] = useState(null); // { source, address, latitude, longitude, accuracy, lastUpdated }
-  const [currentPage, setCurrentPage] = useState('landing'); // 'landing' | 'live-map' | 'prediction'
+  const [currentPage, setCurrentPage] = useState(() => {
+    return sessionStorage.getItem('current_page') || 'landing';
+  }); // 'landing' | 'live-map' | 'prediction' | 'citizen' | 'municipality'
+
+  useEffect(() => {
+    sessionStorage.setItem('current_page', currentPage);
+  }, [currentPage]);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);

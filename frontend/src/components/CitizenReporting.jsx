@@ -16,18 +16,39 @@ import { useEffect } from 'react';
 import { mockReports, saveMockReports } from './Municipality/mockData';
 
 export default function CitizenReporting({ language = 'EN', onBack, user, onUserChange }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => {
+    const saved = sessionStorage.getItem('citizen_wizard_step');
+    return saved ? parseInt(saved, 10) : 1;
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Shared state payload
-  const [reportData, setReportData] = useState({
-    image: null,
-    location: null,
-    analysis: null,
-    user: null,
-    notes: "",
-    trackingId: null
+  const [reportData, setReportData] = useState(() => {
+    const saved = sessionStorage.getItem('citizen_wizard_data');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return {
+      image: null,
+      location: null,
+      analysis: null,
+      user: null,
+      notes: "",
+      trackingId: null
+    };
   });
+
+  useEffect(() => {
+    sessionStorage.setItem('citizen_wizard_step', step.toString());
+  }, [step]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('citizen_wizard_data', JSON.stringify(reportData));
+    } catch(e) {
+      console.warn("Could not save wizard data to sessionStorage (possibly too large)", e);
+    }
+  }, [reportData]);
 
   useEffect(() => {
     if (user) {
@@ -155,7 +176,17 @@ export default function CitizenReporting({ language = 'EN', onBack, user, onUser
           </div>
         );
       case 10:
-        return <SuccessCard trackingId={reportData.trackingId} reportData={reportData} />;
+        return (
+          <SuccessCard 
+            trackingId={reportData.trackingId} 
+            reportData={reportData} 
+            onBack={() => {
+              sessionStorage.removeItem('citizen_wizard_step');
+              sessionStorage.removeItem('citizen_wizard_data');
+              onBack();
+            }}
+          />
+        );
       default:
         return null;
     }

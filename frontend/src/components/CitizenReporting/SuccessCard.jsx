@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, ArrowRight, MapPin, User, Mail, Phone } from 'lucide-react';
 
-export default function SuccessCard({ trackingId, reportData }) {
+export default function SuccessCard({ trackingId, reportData, onBack }) {
   const [showDetails, setShowDetails] = useState(false);
 
   const localImageUrl = reportData?.image || '';
@@ -45,10 +45,10 @@ export default function SuccessCard({ trackingId, reportData }) {
           >
             {showDetails ? 'Hide Submitted Details' : 'View Submitted Reports'}
           </button>
-          <a href="/" className="px-6 py-3 text-sm font-black text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition shadow-md shadow-emerald-500/20 cursor-pointer inline-flex items-center gap-2">
+          <button onClick={onBack} className="px-6 py-3 text-sm font-black text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition shadow-md shadow-emerald-500/20 cursor-pointer inline-flex items-center gap-2">
             <span>Back to Dashboard</span>
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </button>
         </div>
 
         {/* Expandable Details Container */}
