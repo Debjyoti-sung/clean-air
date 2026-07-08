@@ -25,7 +25,7 @@ import LivePollution from './components/LivePollution';
 import PlatformOverview from './components/PlatformOverview';
 import AIWorkflow from './components/AIWorkflow';
 
-import WhyAERION from './components/WhyAERION';
+import WhyAERION from './components/WhyAerioN';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import LocationModal from './components/LocationModal';
