@@ -102,43 +102,86 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude, accuracy } = position.coords;
         const latStr = latitude.toFixed(4);
         const lngStr = longitude.toFixed(4);
 
-        let address = `GPS Telemetry Node Node-${Math.floor(latitude * 100)},\nDetected Coordinates: [${latStr}° N, ${lngStr}° E],\nIndia`;
+        try {
+          // OpenStreetMap Nominatim Reverse Geocoding
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            {
+              headers: {
+                'Accept-Language': 'en'
+              }
+            }
+          );
 
-        let city = '';
-        let district = '';
-        let state = '';
-        for (const [key, coords] of Object.entries(coordinatesMapping)) {
-          if (Math.abs(coords.lat - latitude) < 0.005 && Math.abs(coords.lng - longitude) < 0.005) {
-            const parts = key.split('_'); // [state, district, city]
-            state = parts[0];
-            district = parts[1];
-            city = parts[2];
-            break;
+          if (!response.ok) throw new Error('Nominatim geocoding failed');
+
+          const geoData = await response.json();
+          const addr = geoData.address || {};
+          
+          // Parse city, district, state
+          const city = addr.city || addr.town || addr.village || addr.suburb || addr.municipality || 'GPS Location';
+          const district = addr.county || addr.district || '';
+          const state = addr.state || 'India';
+          const country = addr.country || 'India';
+          const postcode = addr.postcode ? ` - ${addr.postcode}` : '';
+          
+          // Create a precise formatted address
+          const formattedAddress = geoData.display_name || 
+            `${geoData.name || ''}\n${addr.road || ''}\n${city}, ${district}\n${state}${postcode},\n${country}`;
+
+          setSelectedLocation({
+            source: 'GPS',
+            address: formattedAddress,
+            latitude: latStr,
+            longitude: lngStr,
+            accuracy: `± ${Math.round(accuracy)} meters (Precise GPS)`,
+            lastUpdated: 'Just Now',
+            displayName: `${city}, ${state}`,
+            city,
+            district,
+            state
+          });
+        } catch (err) {
+          console.warn('Reverse geocoding failed, falling back to static mapping:', err);
+          
+          let address = `GPS Telemetry Node Node-${Math.floor(latitude * 100)},\nDetected Coordinates: [${latStr}° N, ${lngStr}° E],\nIndia`;
+
+          let city = '';
+          let district = '';
+          let state = '';
+          for (const [key, coords] of Object.entries(coordinatesMapping)) {
+            if (Math.abs(coords.lat - latitude) < 0.005 && Math.abs(coords.lng - longitude) < 0.005) {
+              const parts = key.split('_'); // [state, district, city]
+              state = parts[0];
+              district = parts[1];
+              city = parts[2];
+              break;
+            }
           }
-        }
-        if (!city && Math.abs(28.6273 - latitude) < 0.005 && Math.abs(77.3725 - longitude) < 0.005) {
-          city = 'Noida';
-          district = 'Gautam Buddha Nagar';
-          state = 'Uttar Pradesh';
-        }
+          if (!city && Math.abs(28.6273 - latitude) < 0.005 && Math.abs(77.3725 - longitude) < 0.005) {
+            city = 'Noida';
+            district = 'Gautam Buddha Nagar';
+            state = 'Uttar Pradesh';
+          }
 
-        setSelectedLocation({
-          source: 'GPS',
-          address,
-          latitude: latStr,
-          longitude: lngStr,
-          accuracy: `± ${Math.round(accuracy)} meters (Browser GPS)`,
-          lastUpdated: 'Just Now',
-          displayName: getDisplayNameFromCoords(latitude, longitude),
-          city: city || 'GPS Location',
-          district: district || '',
-          state: state || 'India'
-        });
+          setSelectedLocation({
+            source: 'GPS',
+            address,
+            latitude: latStr,
+            longitude: lngStr,
+            accuracy: `± ${Math.round(accuracy)} meters (Browser GPS)`,
+            lastUpdated: 'Just Now',
+            displayName: getDisplayNameFromCoords(latitude, longitude),
+            city: city || 'GPS Location',
+            district: district || '',
+            state: state || 'India'
+          });
+        }
       },
       (error) => {
         // Fallback automatically to Noida GPS coordinates on permission denial / timeout
