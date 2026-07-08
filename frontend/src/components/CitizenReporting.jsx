@@ -82,7 +82,7 @@ export default function CitizenReporting({ language = 'EN', onBack, user, onUser
       const newReport = {
         id: trackingId,
         citizenName: reportData.user?.user_metadata?.name || reportData.user?.user_metadata?.full_name || reportData.user?.email?.split('@')[0] || "Citizen",
-        citizenEmail: reportData.user?.email || "citizen@cleanair.org",
+        citizenEmail: reportData.user?.email || "citizen@AerioN.org",
         contactNumber: reportData.user?.user_metadata?.phone || "+91 99999 99999",
         issueCategory: reportData.analysis?.category || "Ambient Air Quality",
         priority: reportData.analysis?.severity === 'critical' ? 'Critical' : (reportData.analysis?.severity === 'high' ? 'High' : 'Moderate'),

@@ -151,7 +151,7 @@ export default function PlatformOverview({ language }) {
                 {language === 'EN' ? 'National Environmental Safeguard' : 'राष्ट्रीय पर्यावरण सुरक्षा'}
               </h2>
               <p className="text-[17px] text-slate-500 font-medium leading-relaxed max-w-2xl">
-                CleanAir is engineered as a robust, resilient digital backbone for municipalities, pollution control boards, and environmental researchers. By integrating crowdsourced alerts with advanced space-based monitoring, we remove systemic delays in identifying and resolving air violations.
+                AerioN is engineered as a robust, resilient digital backbone for municipalities, pollution control boards, and environmental researchers. By integrating crowdsourced alerts with advanced space-based monitoring, we remove systemic delays in identifying and resolving air violations.
               </p>
             </div>
   

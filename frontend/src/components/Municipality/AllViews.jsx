@@ -372,7 +372,7 @@ export function SettingsView() {
           
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-bold text-slate-900 text-sm">Auto Route CleanAir Fleet</div>
+              <div className="font-bold text-slate-900 text-sm">Auto Route AerioN Fleet</div>
               <p className="text-xs text-slate-500 font-medium mt-0.5 leading-normal max-w-md">
                 Automatically allocate ward inspectors and heavy wet suppression tankers immediately when the AI confirms coordinates.
               </p>

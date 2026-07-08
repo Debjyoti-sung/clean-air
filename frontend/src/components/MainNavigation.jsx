@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Search, ChevronRight } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export default function MainNavigation({ onSearchClick, onReportClick, language, currentPage, setCurrentPage, user, onLoginClick, onLogoutClick, onRegisterClick }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,11 +63,11 @@ export default function MainNavigation({ onSearchClick, onReportClick, language,
         <div className="flex flex-col select-none cursor-pointer group" onClick={() => { setCurrentPage('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1] flex items-center justify-center text-lg group-hover:shadow-[inset_2px_2px_5px_#cbd5e1] transition-all duration-300">
-              🌿
+              <img src={logo} alt="AerioN Logo" className="w-6 h-6 object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
-                Clean<span className="text-[#15803D]">Air</span>
+                AerioN
               </span>
               <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">
                 {language === 'EN' ? 'Intelligence' : 'खुफिया प्रणाली'}

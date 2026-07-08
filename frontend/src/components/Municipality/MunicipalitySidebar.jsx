@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../../assets/logo.png';
 import { 
   LayoutDashboard, 
   FileWarning, 
@@ -32,12 +33,12 @@ export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen, t
       {/* Brand Logo Header */}
       <div className="flex items-center justify-between mb-8 px-3 relative">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] flex items-center justify-center text-lg">
-            🌿
+          <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] flex items-center justify-center">
+            <img src={logo} alt="AerioN Logo" className="w-6 h-6 object-contain" />
           </div>
           <div className="flex flex-col">
             <span className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
-              Clean<span className="text-[#15803D]">Air</span>
+              AerioN
             </span>
             <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">
               Municipality

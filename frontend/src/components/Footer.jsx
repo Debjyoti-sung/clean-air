@@ -37,7 +37,7 @@ export default function Footer({ language }) {
             {language === 'EN' ? 'Developer & API' : 'डेवलपर और एपीआई'}
           </h4>
           <ul className="space-y-2.5 font-medium text-[13px]">
-            <li><a href="#api" className="hover:text-white transition">CleanAir Open API</a></li>
+            <li><a href="#api" className="hover:text-white transition">AerioN Open API</a></li>
             <li><a href="#docs" className="hover:text-white transition">Sensor Integration Docs</a></li>
             <li><a href="#research" className="hover:text-white transition">Environmental Research Data</a></li>
             <li><a href="#source" className="hover:text-white transition">Source Code Repository</a></li>
@@ -62,7 +62,7 @@ export default function Footer({ language }) {
       {/* Bottom Copyright and Credits */}
       <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-[12px] text-slate-400 gap-4 md:gap-0 font-medium">
         <div className="flex items-center space-x-2 text-center md:text-left flex-wrap justify-center">
-          <span>&copy; {new Date().getFullYear()} CleanAir Environmental Monitoring System. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} AerioN Environmental Monitoring System. All rights reserved.</span>
         </div>
         <div className="flex items-center space-x-3 text-[12px]">
           <span className="text-slate-300">Developed by <strong>Team Vega</strong></span>
