@@ -6,8 +6,6 @@
 
 AERION Intelligence is a **Unified Environmental Intelligence Platform** designed to bridge the gap between citizens and municipal authorities. It combines Live 3D telemetry, Google Earth Engine satellite analysis, AI-powered computer vision, and real-time citizen reporting to combat urban air pollution effectively.
 
-![Aerion Dashboard Overview](https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80)
-
 ---
 
 ## 🌟 Key Features
