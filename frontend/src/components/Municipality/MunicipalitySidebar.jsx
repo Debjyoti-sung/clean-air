@@ -33,7 +33,7 @@ export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen, t
       {/* Brand Logo Header */}
       <div className="flex items-center justify-between mb-8 px-3 relative">
         <div className="flex items-center space-x-3 group">
-          <img src={logo} alt="AERION Logo" className="w-12 h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" />
+          <img src={logo} alt="AERION Logo" className="h-14 w-auto object-contain drop-shadow-xl scale-110 group-hover:scale-125 transition-transform duration-300" />
           <div className="flex flex-col">
             <span className="text-[22px] font-black text-slate-800 tracking-tight leading-none uppercase">
               AERION
