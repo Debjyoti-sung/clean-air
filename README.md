@@ -124,14 +124,5 @@ This repository includes a `render.yaml` Blueprint for 1-click deployment.
 
 ---
 
-## 📧 Email Configuration Notes
-To allow the Municipality Dashboard to send "Complete Resolution" emails:
-1. Enable 2-Step Verification on your Gmail account.
-2. Go to Security > **App Passwords**.
-3. Generate a 16-letter password (e.g., `abcd efgh ijkl mnop`).
-4. Paste it into your `.env` file under `SMTP_PASS` **without spaces** (e.g., `abcdefghijklmnop`).
-
----
-
 ## 📄 License
 This project is licensed under the MIT License.
