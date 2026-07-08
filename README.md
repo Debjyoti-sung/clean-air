@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./frontend/src/assets/logo.png" alt="AERION Logo" width="200"/>
+  <img src="./aerion.png" alt="AERION Logo" width="200"/>
 </div>
 
 # AERION Intelligence 🌍
