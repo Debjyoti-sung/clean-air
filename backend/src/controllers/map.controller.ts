@@ -97,7 +97,7 @@ export const MapController = {
    */
   getSatelliteData: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { lat, lng } = req.query;
+      const { lat, lng, buffer } = req.query;
 
       if (!lat || !lng) {
         res.status(400).json({ error: 'Latitude and Longitude are required query parameters.' });
@@ -106,14 +106,20 @@ export const MapController = {
 
       const latitude = parseFloat(lat as string);
       const longitude = parseFloat(lng as string);
+      const bufferRange = buffer ? parseInt(buffer as string) : 5000;
 
       if (isNaN(latitude) || isNaN(longitude)) {
         res.status(400).json({ error: 'Latitude and Longitude must be valid numbers.' });
         return;
       }
 
+      if (buffer && isNaN(bufferRange)) {
+        res.status(400).json({ error: 'Buffer range must be a valid number.' });
+        return;
+      }
+
       // Check Cache
-      const cacheKey = `satellite_${latitude.toFixed(4)}_${longitude.toFixed(4)}`;
+      const cacheKey = `satellite_${latitude.toFixed(4)}_${longitude.toFixed(4)}_${bufferRange}`;
       const cachedData = apiCache.get(cacheKey);
       
       if (cachedData) {
@@ -122,7 +128,7 @@ export const MapController = {
         return;
       }
 
-      const responseData = await EarthEngineService.getSatelliteData(latitude, longitude);
+      const responseData = await EarthEngineService.getSatelliteData(latitude, longitude, bufferRange);
 
       // Save to Cache
       apiCache.set(cacheKey, responseData);

@@ -1,6 +1,6 @@
 /**
- * Mistral Vision API Service (Mock/Stub for now)
- * Simulates analyzing an uploaded image to classify pollution.
+ * Gemini Vision API Service
+ * Sends uploaded images to the backend for Gemini AI pollution analysis.
  */
 
 export const VisionService = {
@@ -21,20 +21,24 @@ export const VisionService = {
       formData.append('image', fileToUpload, 'upload.jpg');
 
       // 2. Send to backend AI Service
+      console.log('[VisionService] Sending image to backend...');
       const response = await fetch('http://localhost:5000/api/ai/analyze-image', {
         method: 'POST',
-        body: formData // Note: Content-Type is set automatically by the browser with boundary
+        body: formData
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze image via backend');
+        const errorText = await response.text();
+        console.error('[VisionService] Backend error:', response.status, errorText);
+        throw new Error(`Backend returned ${response.status}: ${errorText}`);
       }
 
       const result = await response.json();
+      console.log('[VisionService] Gemini response:', result);
 
       if (!result.isPollution) {
         return {
-          success: false,
+          success: true,
           isPollution: false,
           message: result.explanation || "This image does not appear to contain pollution-related evidence. Please upload a valid environmental incident."
         };
@@ -46,19 +50,14 @@ export const VisionService = {
         data: {
           pollutionType: result.pollutionType || "Unclassified Pollution",
           confidenceScore: result.confidenceScore || 85,
-          explanation: result.explanation || `The AI detected visual signatures consistent with pollution.`,
+          explanation: result.explanation || "The AI detected visual signatures consistent with pollution.",
           severitySuggestion: result.severitySuggestion || "Medium"
         }
       };
 
     } catch (error) {
-      console.error("Vision Service Error:", error);
-      // Fallback for demo purposes if backend is down
-      return {
-        success: false,
-        isPollution: false,
-        message: "Failed to connect to the AI Analysis server. Please try again."
-      };
+      console.error("[VisionService] Error:", error);
+      throw error; // Let the component handle the error state
     }
   }
 };

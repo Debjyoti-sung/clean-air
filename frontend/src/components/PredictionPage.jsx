@@ -133,7 +133,9 @@ export function generateAIModelData(location, lang = 'EN') {
   if (!location) return null;
   const lat = parseFloat(location.latitude) || 28.6273;
   const lng = parseFloat(location.longitude) || 77.3725;
-  const seed = Math.abs(Math.sin(lat) * Math.cos(lng) * 100) % 1;
+  const todayDate = new Date();
+  const dateOffset = todayDate.getDate() + todayDate.getMonth() * 30;
+  const seed = Math.abs(Math.sin(lat + dateOffset) * Math.cos(lng - dateOffset) * 100) % 1;
 
   // Set base AQI range according to major Indian metropolitan nodes
   let baseAqi = 120;
@@ -192,18 +194,29 @@ export function generateAIModelData(location, lang = 'EN') {
     });
   }
 
-  // Generate 4-day forecast: Today and the next 3 days
+  // Generate 7-day forecast based on the historical average
+  const historyAvgAqi = history.reduce((sum, item) => sum + item.aqi, 0) / history.length;
+  
   const forecast = [];
   const forecastLabels = lang === 'EN' 
-    ? ["Today", "Tomorrow", "Day +2", "Day +3"]
-    : ["आज", "कल", "दिन +2", "दिन +3"];
+    ? ["Today", "Tomorrow", "Day +2", "Day +3", "Day +4", "Day +5", "Day +6"]
+    : ["आज", "कल", "दिन +2", "दिन +3", "दिन +4", "दिन +5", "दिन +6"];
     
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 7; i++) {
     const fSeed = Math.abs(Math.sin(lat - i * 2) * Math.cos(lng + i * 3) * 100) % 1;
-    // Today matches baseAqi
-    let change = i === 0 ? 0 : Math.floor((fSeed - 0.4) * 40);
-    const fAqi = Math.max(15, baseAqi + change);
-    const confidence = 87 + Math.floor(fSeed * 11); // 87% - 98%
+    
+    // Today matches baseAqi for continuity. Future days trend towards the historical average + variance.
+    let fAqi;
+    if (i === 0) {
+      fAqi = baseAqi;
+    } else {
+      // Trend slightly towards historical average with some random variance
+      const trend = (historyAvgAqi - baseAqi) * (i / 7);
+      const variance = (fSeed - 0.5) * 60;
+      fAqi = Math.max(15, baseAqi + trend + variance);
+    }
+    
+    const confidence = 85 + Math.floor(fSeed * 14); // 85% - 99%
 
     // Determine Weather Icon name
     let weatherIcon = "sunny";
@@ -219,11 +232,19 @@ export function generateAIModelData(location, lang = 'EN') {
 
     forecast.push({
       label: forecastLabels[i],
-      aqi: fAqi,
+      aqi: Math.round(fAqi),
       confidence,
       weatherIcon
     });
   }
+
+  // Calculate Severity Score (0-100)
+  // Higher AQI, low wind speed, high temperature increase severity
+  let severityScore = (baseAqi / 500) * 100;
+  if (windSpeed < 8) severityScore += 10;
+  if (temp > 35) severityScore += 5;
+  if (parseFloat(rainfall) > 5) severityScore -= 15;
+  severityScore = Math.max(0, Math.min(100, Math.round(severityScore)));
 
   // Generate AI Insights explaining variables' impacts on AQI
   const insights = [];
@@ -286,80 +307,44 @@ export function generateAIModelData(location, lang = 'EN') {
     });
   }
 
-  // Health Advisories depending on AQI value
+  // Health Advisories depending on Severity Score
   let advisories = [];
   let bestTime = "";
   const isEnglish = lang === 'EN';
 
-  // Base AQI Advisories
   if (baseAqi <= 50) {
     advisories.push(isEnglish ? "Air quality is excellent. Ideal for outdoor workouts and leisure." : "वायु गुणवत्ता उत्कृष्ट है। बाहरी कसरत और मनोरंजन के लिए आदर्श।");
+    advisories.push(isEnglish ? "Open windows to let fresh air circulate indoors." : "ताजी हवा को घर के अंदर प्रसारित करने के लिए खिड़कियां खोलें।");
     bestTime = isEnglish ? "Any time of day" : "दिन में किसी भी समय";
   } else if (baseAqi <= 100) {
-    advisories.push(isEnglish ? "Air quality is acceptable. Safe for outdoor exercise." : "वायु गुणवत्ता स्वीकार्य है। बाहरी व्यायाम के लिए सुरक्षित।");
+    advisories.push(isEnglish ? "Air quality is acceptable. Safe for most outdoor exercise." : "वायु गुणवत्ता स्वीकार्य है। अधिकांश बाहरी व्यायाम के लिए सुरक्षित।");
+    advisories.push(isEnglish ? "Unusually sensitive people should consider reducing prolonged outdoor exertion." : "असामान्य रूप से संवेदनशील लोगों को लंबे समय तक बाहरी परिश्रम को कम करने पर विचार करना चाहिए।");
     bestTime = isEnglish ? "11:00 AM - 04:00 PM (winds are active)" : "सुबह 11:00 बजे - शाम 04:00 बजे (हवाएं सक्रिय हैं)";
-  } else if (baseAqi <= 200) {
-    advisories.push(isEnglish ? "Air quality is poor. Sensitive groups should limit prolonged outdoor physical activities." : "वायु गुणवत्ता खराब है। संवेदनशील समूहों को लंबे समय तक बाहरी शारीरिक गतिविधियों को सीमित करना चाहिए।");
+  } else if (baseAqi <= 150) {
+    advisories.push(isEnglish ? "Air quality is poor for sensitive groups. Reduce heavy outdoor exertion." : "संवेदनशील समूहों के लिए वायु गुणवत्ता खराब है। भारी बाहरी व्यायाम कम करें।");
+    advisories.push(isEnglish ? "Asthma patients should carry inhalers and avoid dusty roads." : "अस्थमा के मरीजों को इनहेलर रखना चाहिए और धूल भरी सड़कों से बचना चाहिए।");
     bestTime = isEnglish ? "01:00 PM - 03:00 PM (maximum dispersion)" : "दोपहर 01:00 बजे - दोपहर 03:00 बजे (अधिकतम प्रसार)";
+  } else if (baseAqi <= 200) {
+    advisories.push(isEnglish ? "Air quality is unhealthy. Everyone may begin to experience health effects." : "वायु गुणवत्ता अस्वस्थ है। हर किसी को स्वास्थ्य प्रभाव का अनुभव होना शुरू हो सकता है।");
+    advisories.push(isEnglish ? "Avoid exercising near high-traffic roads or industrial areas." : "अधिक यातायात वाली सड़कों या औद्योगिक क्षेत्रों के पास व्यायाम करने से बचें।");
+    bestTime = isEnglish ? "Short durations only" : "केवल कम अवधि";
   } else if (baseAqi <= 300) {
     advisories.push(isEnglish ? "Air quality is very poor. Wear certified N95 masks for any outdoor activity or transit." : "वायु गुणवत्ता बहुत खराब है। किसी भी बाहरी गतिविधि या यात्रा के लिए प्रमाणित N95 मास्क पहनें।");
+    advisories.push(isEnglish ? "Keep all windows closed and activate HEPA air filtration." : "सभी खिड़कियां बंद रखें और HEPA एयर निस्पंदन सक्रिय करें।");
     bestTime = isEnglish ? "Avoid outdoor exposure" : "बाहर जाने से बचें";
   } else {
     advisories.push(isEnglish ? "Severe air crisis. Avoid all outdoor exposures and use continuous air filtration indoors." : "गंभीर वायु संकट। सभी बाहरी जोखिमों से बचें और घर के अंदर निरंतर वायु निस्पंदन का उपयोग करें।");
+    advisories.push(isEnglish ? "If travel is absolutely necessary, strictly use N95 or N99 respirator masks." : "यदि यात्रा नितांत आवश्यक है, तो सख्ती से N95 या N99 श्वासयंत्र मास्क का उपयोग करें।");
+    advisories.push(isEnglish ? "Do not perform any strenuous physical activities." : "कोई भी ज़ोरदार शारीरिक गतिविधि न करें।");
     bestTime = isEnglish ? "Emergency transit only" : "केवल आपातकालीन यात्रा";
   }
 
-  // Weather conditions
-  if (windSpeed > 16) {
-    advisories.push(isEnglish ? "High wind speeds are helping disperse pollutants. Ensure windows are secured against dust." : "तेज हवा की गति प्रदूषकों को फैलाने में मदद कर रही है। सुनिश्चित करें कि खिड़कियां धूल से सुरक्षित हैं।");
-  } else if (windSpeed < 9) {
-    advisories.push(isEnglish ? "Low wind conditions are causing pollutants to stagnate. Keep indoor spaces well-ventilated if possible." : "हवा की गति कम होने से प्रदूषक जमा हो रहे हैं। यदि संभव हो तो इनडोर स्थानों को अच्छी तरह हवादार रखें।");
-  }
-
-  if (parseFloat(rainfall) > 0.0) {
-    advisories.push(isEnglish ? "Heavy rainfall is washing out airborne particulate matter, rapidly improving air quality." : "भारी वर्षा हवा में मौजूद कणों को साफ कर रही है, जिससे वायु गुणवत्ता में तेजी से सुधार हो रहा है।");
-  }
-
-  // Pollutant sources
-  if (constructionDust > 3) {
-    advisories.push(isEnglish ? "High construction activity detected nearby. Wear protective masks when traveling through affected zones." : "आस-पास भारी निर्माण गतिविधि का पता चला है। प्रभावित क्षेत्रों से यात्रा करते समय सुरक्षात्मक मास्क पहनें।");
-  }
-
-  if (seed > 0.45) { // Smoke detected
-    advisories.push(isEnglish ? "Smoke plumes have been detected in the vicinity. Keep windows closed to prevent indoor contamination." : "आस-पास धुएं के गुबार पाए गए हैं। घर के अंदर प्रदूषण को रोकने के लिए खिड़कियां बंद रखें।");
-  }
-
-  if (industrialSmoke > 2) {
-    advisories.push(isEnglish ? "Industrial emissions are elevating local PM levels. Avoid prolonged exposure in industrial corridors." : "औद्योगिक उत्सर्जन स्थानीय पीएम स्तर बढ़ा रहा है। औद्योगिक गलियारों में लंबे समय तक रहने से बचें।");
-  }
-
-  if (garbageBurning > 1) {
-    advisories.push(isEnglish ? "Local garbage burning is significantly impacting air quality. Report incidents to municipal authorities." : "स्थानीय कचरा जलाना वायु गुणवत्ता को काफी प्रभावित कर रहा है। नगर निगम अधिकारियों को घटनाओं की रिपोर्ट करें।");
-  }
-
-  if (seed > 0.35) { // Elevated dust
-    advisories.push(isEnglish ? "Noticeable dust accumulation is expected. Use HEPA air purifiers indoors for relief." : "उल्लेखनीय धूल संचय की उम्मीद है। राहत के लिए घर के अंदर HEPA एयर प्यूरीफायर का उपयोग करें।");
-  }
-  
-  // Trend (Improving / Deteriorating)
-  let nextDayAqi = forecast[1]?.aqi || baseAqi;
-  if (nextDayAqi > baseAqi + 20) {
-    advisories.push(isEnglish ? "Air quality is expected to deteriorate tomorrow. Plan outdoor activities accordingly." : "कल वायु गुणवत्ता खराब होने की उम्मीद है। तदनुसार बाहरी गतिविधियों की योजना बनाएं।");
-  } else if (nextDayAqi < baseAqi - 20) {
-    advisories.push(isEnglish ? "Air quality is steadily improving. Favorable conditions for outdoor planning soon." : "वायु गुणवत्ता में लगातार सुधार हो रहा है। जल्द ही बाहरी योजना के लिए अनुकूल परिस्थितियां।");
-  }
-
-  // Ensure we show at most 5 advisories to not clutter the UI
-  if (advisories.length > 5) {
-    advisories = advisories.slice(0, 5);
-  }
-
   let summaryText = "";
-  if (baseAqi > 200) {
+  if (severityScore > 60) {
     summaryText = lang === 'EN'
       ? "Stagnant boundary layer combined with satellite-detected smoke and municipal citizen complaints has triggered significant PM2.5 and PM10 accumulation."
       : "ठहरी हुई वायुमंडलीय परत, सैटेलाइट-पहचाने गए धुएं और नागरिक शिकायतों के कारण पीएम2.5 और पीएम10 का गंभीर संचय हुआ है।";
-  } else if (baseAqi < 75) {
+  } else if (severityScore < 30) {
     summaryText = lang === 'EN'
       ? "High wind dispersion speed and zero active citizen alerts have cleaned the boundary layer, yielding exceptionally low particulate concentrations."
       : "हवा की तेज प्रसार गति और शून्य सक्रिय नागरिक अलर्ट ने वातावरण को साफ कर दिया है, जिससे कणों की सांद्रता बहुत कम हो गई है।";
@@ -388,6 +373,7 @@ export function generateAIModelData(location, lang = 'EN') {
     insights,
     advisories,
     bestTime,
+    severityScore,
     confidence: 91 + Math.floor(seed * 7), // 91% - 98%
     lastUpdated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   };
@@ -490,24 +476,38 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
   };
 
   // SVG coordinate mapper for history graph
+  // SVG coordinate mapper for 14-day timeline graph (History + Forecast)
   const renderHistoryGraph = () => {
-    if (!aiData || !aiData.history) return null;
-    const history = aiData.history;
+    if (!aiData || !aiData.history || !aiData.forecast) return null;
+    
+    // Combine history (7 days) and forecast (7 days)
+    const history = aiData.history.map(item => ({ ...item, isForecast: false }));
+    const forecast = aiData.forecast.map(item => ({ 
+      day: item.label === "Today" ? "Today" : item.label.replace("Day +", "D+"),
+      aqi: item.aqi,
+      temp: aiData.temp, // simplified
+      humidity: aiData.humidity,
+      windSpeed: aiData.windSpeed,
+      citizenReports: 0,
+      satelliteStatus: "AI Predicted",
+      isForecast: true 
+    }));
+    const fullTimeline = [...history, ...forecast];
     
     // SVG Dimensions
-    const width = 700;
-    const height = 280;
+    const width = 1000;
+    const height = 320;
     const paddingLeft = 50;
-    const paddingRight = 30;
+    const paddingRight = 40;
     const paddingTop = 40;
-    const paddingBottom = 40;
+    const paddingBottom = 50;
 
     const chartWidth = width - paddingLeft - paddingRight;
     const chartHeight = height - paddingTop - paddingBottom;
-    const maxAqi = 350;
+    const maxAqi = 400;
 
-    const points = history.map((item, idx) => {
-      const x = paddingLeft + idx * (chartWidth / 6);
+    const points = fullTimeline.map((item, idx) => {
+      const x = paddingLeft + idx * (chartWidth / (fullTimeline.length - 1));
       const y = height - paddingBottom - (item.aqi / maxAqi) * chartHeight;
       return { x, y, ...item };
     });
@@ -522,14 +522,20 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
 
     // Threshold lines for Y-axis
     const thresholdValues = [50, 100, 200, 300];
+    const todayIndex = 6; // Index 6 is 'Today' (the 7th item)
+    const todayX = points[todayIndex]?.x || 0;
 
     return (
-      <div className="relative w-full overflow-x-auto select-none bg-slate-55/30 p-2 md:p-4 rounded-xl border border-slate-100">
-        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="min-w-[650px] overflow-visible">
+      <div className="relative w-full overflow-x-auto select-none neu-pressed p-4 md:p-6 rounded-3xl">
+        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="min-w-[800px] overflow-visible">
           <defs>
             <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
+              <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
               <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+            </linearGradient>
+            <linearGradient id="forecastGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -551,7 +557,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                   x={paddingLeft - 8} 
                   y={y + 4} 
                   textAnchor="end" 
-                  className="text-[10px] font-bold fill-slate-400"
+                  className="text-[11px] font-bold fill-slate-500"
                 >
                   {val}
                 </text>
@@ -559,15 +565,40 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
             );
           })}
 
-          {/* Bottom border & X-Axis label positions */}
+          {/* Bottom border */}
           <line 
             x1={paddingLeft} 
             y1={height - paddingBottom} 
             x2={width - paddingRight} 
             y2={height - paddingBottom} 
-            stroke="#cbd5e1" 
-            strokeWidth="1.5"
+            stroke="#94A3B8" 
+            strokeWidth="2"
+            className="opacity-50"
           />
+
+          {/* Today Divider */}
+          <line 
+            x1={todayX} 
+            y1={paddingTop - 20} 
+            x2={todayX} 
+            y2={height - paddingBottom} 
+            stroke="#64748B" 
+            strokeWidth="2"
+            strokeDasharray="6 6"
+            className="opacity-60"
+          />
+          <rect x={todayX - 45} y={paddingTop - 35} width="90" height="24" rx="12" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="1" />
+          <text x={todayX} y={paddingTop - 18} textAnchor="middle" className="text-[11px] font-black fill-slate-600 uppercase tracking-widest">
+            TODAY
+          </text>
+          
+          <text x={paddingLeft + 40} y={paddingTop - 18} textAnchor="start" className="text-[11px] font-black fill-emerald-600 uppercase tracking-widest">
+            ← HISTORICAL
+          </text>
+          
+          <text x={width - paddingRight - 40} y={paddingTop - 18} textAnchor="end" className="text-[11px] font-black fill-blue-600 uppercase tracking-widest">
+            FORECAST →
+          </text>
 
           {/* Render Area Path */}
           {areaPath && (
@@ -584,46 +615,46 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
               d={linePath} 
               fill="none" 
               stroke="#10B981" 
-              strokeWidth="3.5" 
+              strokeWidth="4" 
               strokeLinecap="round" 
               strokeLinejoin="round"
-              className="animated-line"
+              className="animated-line drop-shadow-md"
               style={{
-                strokeDasharray: '1000',
-                strokeDashoffset: '1000',
-                animation: 'drawLine 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+                strokeDasharray: '2000',
+                strokeDashoffset: '2000',
+                animation: 'drawLine 2s cubic-bezier(0.4, 0, 0.2, 1) forwards'
               }}
             />
           )}
 
-          {/* Render hover interaction areas & dots */}
+          {/* Render dots */}
           {points.map((p, idx) => (
             <g key={idx}>
               <text 
                 x={p.x} 
-                y={height - paddingBottom + 20} 
+                y={height - paddingBottom + 25} 
                 textAnchor="middle" 
-                className="text-[11.5px] font-bold fill-slate-500"
+                className={`text-[12px] font-extrabold ${p.isForecast ? 'fill-blue-600' : 'fill-slate-500'}`}
               >
                 {p.day}
               </text>
               <circle
                 cx={p.x}
                 cy={p.y}
-                r={hoveredDot === idx ? 7 : 5}
-                className={`transition-all duration-200 cursor-pointer ${
+                r={hoveredDot === idx ? 8 : 6}
+                className={`transition-all duration-300 cursor-pointer ${
                   hoveredDot === idx 
-                    ? 'fill-emerald-650 stroke-white stroke-[2px] filter drop-shadow-md' 
-                    : 'fill-[#10B981] stroke-white stroke-[1.5px]'
+                    ? p.isForecast ? 'fill-blue-600 stroke-white stroke-[3px] filter drop-shadow-lg' : 'fill-emerald-600 stroke-white stroke-[3px] filter drop-shadow-lg'
+                    : p.isForecast ? 'fill-blue-500 stroke-white stroke-[2px]' : 'fill-[#10B981] stroke-white stroke-[2px]'
                 }`}
                 onMouseEnter={() => setHoveredDot(idx)}
                 onMouseLeave={() => setHoveredDot(null)}
               />
-              {/* Invisible larger hover zone circle for ease of touch/hover */}
+              {/* Invisible larger hover zone */}
               <circle
                 cx={p.x}
                 cy={p.y}
-                r={20}
+                r={24}
                 className="fill-transparent cursor-pointer"
                 onMouseEnter={() => setHoveredDot(idx)}
                 onMouseLeave={() => setHoveredDot(null)}
@@ -635,43 +666,41 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
         {/* Hover Tooltip display */}
         {hoveredDot !== null && points[hoveredDot] && (
           <div 
-            className="absolute bg-white/95 backdrop-blur-md border border-slate-200/80 p-3.5 rounded-xl shadow-xl z-25 pointer-events-none text-left w-56 animate-fadeIn"
+            className="absolute bg-[#F1F5F9] border border-slate-200/80 p-4 rounded-2xl shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] z-25 pointer-events-none text-left w-64 animate-fadeIn"
             style={{
-              left: `${Math.min(points[hoveredDot].x + 12, chartWidth - 140)}px`,
-              top: `${Math.max(10, points[hoveredDot].y - 90)}px`
+              left: `${Math.min(points[hoveredDot].x + 20, chartWidth - 160)}px`,
+              top: `${Math.max(10, points[hoveredDot].y - 120)}px`
             }}
           >
-            <div className="font-extrabold text-slate-800 border-b border-slate-100 pb-1.5 mb-2 flex justify-between items-center text-[12.5px]">
-              <span>{points[hoveredDot].day}</span>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold shadow-sm ${getAqiCategory(points[hoveredDot].aqi).bg} ${getAqiCategory(points[hoveredDot].aqi).text}`}>
+            <div className="font-extrabold text-slate-800 border-b border-slate-200 pb-2 mb-3 flex justify-between items-center text-[13px]">
+              <span className="uppercase tracking-wider">{points[hoveredDot].day}</span>
+              <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold shadow-inner ${getAqiCategory(points[hoveredDot].aqi).bg} ${getAqiCategory(points[hoveredDot].aqi).text}`}>
                 {getAqiCategory(points[hoveredDot].aqi).name}
               </span>
             </div>
-            <div className="space-y-1.5 text-[11.5px] font-bold text-slate-655">
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.estimatedAQI}:</span>
-                <span className="text-slate-900 font-extrabold text-[12px]">{points[hoveredDot].aqi}</span>
+            <div className="space-y-2 text-[12px] font-bold text-slate-600">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 font-medium">{t.estimatedAQI}:</span>
+                <span className={`text-xl font-black ${getAqiCategory(points[hoveredDot].aqi).textHex ? `text-[${getAqiCategory(points[hoveredDot].aqi).textHex}]` : 'text-slate-900'}`}>{points[hoveredDot].aqi}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.temp}:</span>
-                <span className="text-slate-800">{points[hoveredDot].temp}°C</span>
+                <span className="text-slate-500 font-medium">Type:</span>
+                <span className={points[hoveredDot].isForecast ? "text-blue-600 font-extrabold" : "text-emerald-600 font-extrabold"}>
+                  {points[hoveredDot].isForecast ? "AI Forecast" : "Historical"}
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.humidity}:</span>
-                <span className="text-slate-800">{points[hoveredDot].humidity}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.windSpeed}:</span>
-                <span className="text-slate-800">{points[hoveredDot].windSpeed} km/h</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.citizenReports}:</span>
-                <span className="text-slate-800">{points[hoveredDot].citizenReports}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">{t.smoke}:</span>
-                <span className="text-slate-800 truncate max-w-[100px]">{points[hoveredDot].satelliteStatus}</span>
-              </div>
+              {!points[hoveredDot].isForecast && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 font-medium">{t.temp}:</span>
+                    <span className="text-slate-800">{points[hoveredDot].temp}°C</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 font-medium">{t.windSpeed}:</span>
+                    <span className="text-slate-800">{points[hoveredDot].windSpeed} km/h</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -680,7 +709,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
   };
 
   return (
-    <section className="w-full py-10 bg-[#F8FAFC] px-4 md:px-8 min-h-[80vh]">
+    <section className="w-full pt-32 pb-10 bg-[#F1F5F9] px-4 md:px-8 min-h-[80vh]">
       <div className="max-w-[1440px] mx-auto space-y-6">
 
         {/* PAGE HEADER NAVIGATION BAR */}
@@ -688,7 +717,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
           <div className="flex items-start space-x-3 text-left">
             <button
               onClick={onBack}
-              className="p-2.5 mt-1 bg-white border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-655 rounded-lg shadow-sm hover:shadow transition cursor-pointer"
+              className="neu-button p-2.5 mt-1 text-slate-500 rounded-xl transition cursor-pointer"
               title={t.backBtn}
             >
               <ArrowLeft className="w-5 h-5" />
@@ -705,10 +734,10 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
           </div>
 
           {/* TOP RIGHT TELEMETRY AND LOCATION BADGE */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start lg:self-center bg-white/60 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 shadow-sm shrink-0 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start lg:self-center neu-flat p-3 rounded-2xl shrink-0 w-full sm:w-auto">
             {localLocation ? (
               <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                <div className="flex items-center space-x-2 bg-[#F1F5F9] px-3.5 py-2 rounded-xl text-[13px] font-extrabold text-slate-700">
+                <div className="flex items-center space-x-2 neu-pressed px-3.5 py-2 rounded-xl text-[13px] font-extrabold text-slate-700">
                   <MapPin className="w-4 h-4 text-[#15803D]" />
                   <span className="truncate max-w-[140px] md:max-w-[200px]">
                     {localLocation.displayName || getDisplayNameFromCoords(localLocation.latitude, localLocation.longitude)}
@@ -723,7 +752,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
 
                 {aiData && (
                   <>
-                    <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-2 rounded-xl text-[12.5px] font-bold text-left">
+                    <div className="neu-pressed text-emerald-800 px-3.5 py-2 rounded-xl text-[12.5px] font-bold text-left">
                       <div className="text-[9.5px] uppercase text-emerald-600 font-black tracking-wider leading-none">{t.confidence}</div>
                       <div className="mt-0.5 flex items-center space-x-1.5">
                         <Zap className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600 animate-bounce" />
@@ -731,7 +760,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl text-[12.5px] font-bold text-left hidden md:block">
+                    <div className="neu-pressed text-slate-700 px-3.5 py-2 rounded-xl text-[12.5px] font-bold text-left hidden md:block">
                       <div className="text-[9.5px] uppercase text-slate-400 font-black tracking-wider leading-none">{t.lastUpdated}</div>
                       <div className="mt-0.5 flex items-center space-x-1.5">
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -749,7 +778,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                 </span>
                 <button
                   onClick={() => setIsLocalModalOpen(true)}
-                  className="bg-[#15803D] hover:bg-[#166534] text-white text-[12.5px] font-bold px-4 py-2 rounded-lg shadow transition cursor-pointer"
+                  className="neu-button text-emerald-600 text-[12.5px] font-bold px-4 py-2 rounded-xl transition cursor-pointer"
                 >
                   📍 {t.chooseLocation}
                 </button>
@@ -761,8 +790,8 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
         {/* INTERACTIVE PAGE CONTAINER */}
         {!localLocation ? (
           /* NO LOCATION AWAITING CONFIGURATION */
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-12 text-center flex flex-col items-center justify-center space-y-6 min-h-[400px]">
-            <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 shadow-sm">
+          <div className="neu-flat rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-6 min-h-[400px]">
+            <div className="w-16 h-16 rounded-2xl neu-pressed flex items-center justify-center text-slate-400">
               <Lock className="w-7 h-7 text-slate-400 animate-pulse" />
             </div>
             <div className="space-y-2">
@@ -773,7 +802,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
             </div>
             <button
               onClick={() => setIsLocalModalOpen(true)}
-              className="text-[14px] font-black text-white bg-[#15803D] hover:bg-[#166534] px-6 py-3 rounded-xl shadow hover:shadow-md transition-all cursor-pointer flex items-center space-x-2"
+              className="text-[14px] font-black text-emerald-600 neu-button px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2"
             >
               <Compass className="w-4 h-4 animate-spin-slow" />
               <span>📍 {t.chooseLocation}</span>
@@ -781,12 +810,12 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
           </div>
         ) : loadingStep >= 0 ? (
           /* STEPPED PIPELINE LOADING ANIMATION */
-          <div className="bg-white rounded-3xl border border-slate-250/80 shadow-md p-10 md:p-16 text-center flex flex-col items-center justify-center min-h-[450px] space-y-8 animate-fadeIn">
+          <div className="neu-flat rounded-3xl p-10 md:p-16 text-center flex flex-col items-center justify-center min-h-[450px] space-y-8 animate-fadeIn">
             <div className="relative flex items-center justify-center w-24 h-24">
               {/* Outer scanning rings */}
-              <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 border-t-emerald-600 animate-spin"></div>
-              <div className="absolute inset-2 rounded-full border-4 border-slate-100 border-b-[#15803D]/60 animate-spin-slow"></div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-inner">
+              <div className="absolute inset-0 rounded-full border-4 border-[#F1F5F9] border-t-emerald-500 animate-spin shadow-[4px_4px_10px_rgba(0,0,0,0.05),-4px_-4px_10px_rgba(255,255,255,0.8)]"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-[#F1F5F9] border-b-emerald-600 animate-spin-slow"></div>
+              <div className="w-12 h-12 rounded-2xl neu-pressed flex items-center justify-center">
                 <Brain className="w-6 h-6 text-[#15803D] animate-pulse" />
               </div>
             </div>
@@ -797,7 +826,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
             </div>
 
             {/* Stepped Checklist Progress */}
-            <div className="w-full max-w-sm space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-200 text-left font-semibold">
+            <div className="w-full max-w-sm space-y-3 neu-pressed p-6 rounded-2xl text-left font-semibold">
               {loadingSteps.map((step, idx) => {
                 const isCompleted = idx < loadingStep;
                 const isActive = idx === loadingStep;
@@ -826,13 +855,13 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
 
 
             {/* SECTION 2: ESTIMATED AQI HISTORY GRAPH */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6 space-y-4">
+            <div className="neu-flat rounded-3xl p-5 md:p-6 space-y-4">
               <div className="flex justify-between items-center flex-wrap gap-2">
                 <div>
                   <h3 className="text-lg font-bold text-slate-850">{t.historyTitle}</h3>
                   <p className="text-[12.5px] text-slate-400 font-medium">This graph represents the historical AQI data of the previous seven days.</p>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-slate-50 border border-slate-200 text-slate-500">
+                <span className="inline-flex items-center px-2.5 py-1.5 rounded-full text-[11px] font-bold neu-pressed text-slate-500">
                   📈 {t.title}
                 </span>
               </div>
@@ -852,7 +881,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                   return (
                     <div 
                       key={idx} 
-                      className={`bg-white rounded-2xl border-t-4 ${cat.border} border-x border-b border-slate-200/80 p-5 shadow-sm hover:shadow hover:-translate-y-1 transition duration-200 flex flex-col justify-between relative`}
+                      className={`neu-pressed rounded-3xl border-t-4 ${cat.border} border-x border-b border-transparent p-5 hover:-translate-y-1 transition duration-200 flex flex-col justify-between relative`}
                     >
                       <div className="flex justify-between items-start">
                         <span className="text-[12px] text-slate-400 font-black uppercase tracking-wider">{f.label}</span>
@@ -878,7 +907,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
             </div>
 
             {/* SECTION 4: WHY AI PREDICTED THIS */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div className="neu-flat rounded-3xl p-6 space-y-4">
               <div>
                 <h3 className="text-lg font-bold text-[#111827] flex items-center space-x-2">
                   <Brain className="w-5 h-5 text-[#15803D]" />
@@ -891,9 +920,9 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
                 {aiData.insights.map((insight, idx) => (
                   <div 
                     key={idx} 
-                    className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start space-x-3 text-[13px] font-bold text-slate-700"
+                    className="p-4 rounded-2xl neu-pressed flex items-start space-x-3 text-[13px] font-bold text-slate-700"
                   >
-                    <div className="p-2 bg-white rounded-lg border border-slate-150 shrink-0">
+                    <div className="p-2 neu-flat rounded-xl shrink-0">
                       {getInsightIcon(insight.type)}
                     </div>
                     <div className="flex-1 space-y-1">
@@ -921,7 +950,7 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
             </div>
 
             {/* SECTION 5: HEALTH ADVISORY */}
-            <div className="bg-white rounded-2xl border border-slate-250/80 shadow-sm p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+            <div className="neu-flat rounded-3xl p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
               <div className="space-y-3 lg:col-span-1 border-b lg:border-b-0 lg:border-r border-slate-200 pb-5 lg:pb-0 lg:pr-6">
                 <span className="text-[10px] font-black uppercase tracking-wider text-rose-650 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-full flex items-center space-x-1.5 w-fit">
                   <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500 animate-pulse" />
@@ -949,63 +978,6 @@ export default function PredictionPage({ language, selectedLocation, onOpenLocat
               </div>
             </div>
 
-            {/* SECTION 6: AI ESTIMATION WORKFLOW */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-              <div className="text-center space-y-1.5">
-                <h3 className="text-lg font-black text-slate-900 flex items-center justify-center space-x-2">
-                  <Brain className="w-5 h-5 text-[#15803D]" />
-                  <span>{t.workflowTitle}</span>
-                </h3>
-                <p className="text-[13px] text-slate-500 font-medium max-w-xl mx-auto">
-                  Step-by-step aggregation and pipeline processing map demonstrating how environmental signals are transformed into predicted AQI forecasts.
-                </p>
-              </div>
-
-              {/* Connected node timeline */}
-              <div className="flex flex-col space-y-3 max-w-lg mx-auto py-3">
-                {/* Node 1: Selected Location */}
-                <div className="flex items-center space-x-4 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <div className="w-9 h-9 rounded-lg bg-red-50 border border-red-150 flex items-center justify-center text-red-650 shrink-0"><MapPin className="w-5 h-5" /></div>
-                  <div className="text-left font-bold"><div className="text-[10px] text-slate-400 uppercase font-black tracking-wider leading-none">Step 1</div><span className="text-[13.5px] text-slate-800">{t.nodes.location}</span></div>
-                </div>
-
-                <div className="flex justify-center py-0.5"><div className="h-6 w-0.5 bg-dashed border-l-2 border-slate-300" /></div>
-
-                {/* Node 2-4: Ingestion Layers */}
-                <div className="bg-slate-50 border border-slate-250 p-4 rounded-xl space-y-3">
-                  <div className="text-[10.5px] text-slate-400 uppercase font-black tracking-wider leading-none text-left">Step 2: Aggregated Raw Inputs</div>
-                  <div className="space-y-2 font-bold text-[13px] text-slate-750">
-                    <div className="flex items-center space-x-3"><CloudRain className="w-4 h-4 text-blue-500 shrink-0" /> <span>{t.nodes.weather}</span></div>
-                    <div className="flex items-center space-x-3"><Layers className="w-4 h-4 text-purple-500 shrink-0" /> <span>{t.nodes.satellite}</span></div>
-                    <div className="flex items-center space-x-3"><AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" /> <span>{t.nodes.citizen}</span></div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center py-0.5"><div className="h-6 w-0.5 bg-dashed border-l-2 border-slate-300" /></div>
-
-                {/* Node 5: Estimated AQI History */}
-                <div className="flex items-center space-x-4 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-150 flex items-center justify-center text-emerald-650 shrink-0"><Activity className="w-5 h-5" /></div>
-                  <div className="text-left font-bold"><div className="text-[10px] text-slate-400 uppercase font-black tracking-wider leading-none">Step 3</div><span className="text-[13.5px] text-slate-800">{t.nodes.history}</span></div>
-                </div>
-
-                <div className="flex justify-center py-0.5"><div className="h-6 w-0.5 bg-dashed border-l-2 border-slate-300" /></div>
-
-                {/* Node 6: AI Prediction Model */}
-                <div className="flex items-center space-x-4 p-3 bg-gradient-to-r from-emerald-500 to-[#15803D] text-white rounded-xl shadow-sm border border-emerald-600">
-                  <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0"><Brain className="w-5 h-5" /></div>
-                  <div className="text-left font-extrabold"><div className="text-[10px] text-emerald-150 uppercase font-black tracking-wider leading-none">Step 4: AI Model Engine</div><span className="text-[13.5px]">{t.nodes.aiModel}</span></div>
-                </div>
-
-                <div className="flex justify-center py-0.5"><div className="h-6 w-0.5 bg-dashed border-l-2 border-slate-300" /></div>
-
-                {/* Node 7: Estimated AQI Forecast */}
-                <div className="flex items-center space-x-4 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-150 flex items-center justify-center text-blue-655 shrink-0"><Gauge className="w-5 h-5" /></div>
-                  <div className="text-left font-bold"><div className="text-[10px] text-slate-400 uppercase font-black tracking-wider leading-none">Step 5: Output Generation</div><span className="text-[13.5px] text-slate-800">{t.nodes.forecast}</span></div>
-                </div>
-              </div>
-            </div>
 
           </div>
         ) : null}

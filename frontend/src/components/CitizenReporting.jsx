@@ -7,15 +7,14 @@ import OverpassAnalysisCard from './CitizenReporting/OverpassAnalysisCard';
 import AQICard from './CitizenReporting/AQICard';
 import WeatherCard from './CitizenReporting/WeatherCard';
 import SatelliteCard from './CitizenReporting/SatelliteCard';
-import AIAnalysisCard from './CitizenReporting/AIAnalysisCard';
-import SeverityCard from './CitizenReporting/SeverityCard';
 import ReportSummaryCard from './CitizenReporting/ReportSummaryCard';
 import AuthPromptCard from './CitizenReporting/AuthPromptCard';
 import SuccessCard from './CitizenReporting/SuccessCard';
 import { SupabaseService } from '../services/supabase.service';
 import { EmailService } from '../services/email.service';
+import { useEffect } from 'react';
 
-export default function CitizenReporting({ language = 'EN', onBack }) {
+export default function CitizenReporting({ language = 'EN', onBack, user, onUserChange }) {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -29,15 +28,22 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
     trackingId: null
   });
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 12));
+  useEffect(() => {
+    if (user) {
+      setReportData(prev => ({ ...prev, user }));
+    } else {
+      setReportData(prev => ({ ...prev, user: null }));
+    }
+  }, [user]);
+
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 10));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
   // Determine if 'Next' button should be disabled
   const isNextDisabled = () => {
     if (step === 1 && !reportData.image) return true;
     if (step === 2 && !reportData.location?.lat) return true;
-    if (step === 7 && (!reportData.analysis || !reportData.analysis.isPollution)) return true;
-    if (step === 10 && !reportData.user) return true;
+    if (step === 8 && !reportData.user) return true;
     return false;
   };
 
@@ -56,7 +62,7 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
         await EmailService.sendConfirmation(reportData.user.email, { trackingId: res.trackingId });
       }
       
-      nextStep(); // Go to step 12 (Success)
+      nextStep(); // Go to step 10 (Success)
     } catch (error) {
       alert("Failed to submit report. Please try again.");
     } finally {
@@ -85,26 +91,21 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
       case 6:
         return <SatelliteCard coords={reportData.location} />;
       case 7:
-        return <AIAnalysisCard 
-          image={reportData.image} 
-          onAnalysisComplete={(data) => setReportData(prev => ({ ...prev, analysis: data }))}
-        />;
-      case 8:
-        return <SeverityCard coords={reportData.location} analysisData={reportData.analysis} />;
-      case 9:
         return <ReportSummaryCard 
           data={reportData} 
           notes={reportData.notes}
           setNotes={(val) => setReportData(prev => ({ ...prev, notes: val }))}
         />;
-      case 10:
+      case 8:
         return <AuthPromptCard 
-          onAuthenticated={(user) => {
-            setReportData(prev => ({ ...prev, user }));
+          user={user}
+          onAuthenticated={(loggedInUser) => {
+            if (onUserChange) onUserChange(loggedInUser);
+            setReportData(prev => ({ ...prev, user: loggedInUser }));
             nextStep();
           }}
         />;
-      case 11:
+      case 9:
         return (
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
             <h2 className="text-2xl font-black text-slate-900 mb-4">Ready to Submit?</h2>
@@ -121,7 +122,7 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
             </button>
           </div>
         );
-      case 12:
+      case 10:
         return <SuccessCard trackingId={reportData.trackingId} />;
       default:
         return null;
@@ -163,7 +164,7 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
           <StepperSidebar currentStep={step} language={language} />
 
           <div className="flex-1 flex flex-col min-h-[500px]">
-            <div className="bg-white/60 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] p-6 md:p-8 shadow-sm relative flex flex-col flex-1">
+            <div className="neu-flat rounded-[2.5rem] p-6 md:p-8 relative flex flex-col flex-1">
               
               {/* Dynamic Content */}
               <div className="flex-1 pb-8">
@@ -171,27 +172,27 @@ export default function CitizenReporting({ language = 'EN', onBack }) {
               </div>
 
               {/* Navigation Footer (Hide on Success step) */}
-              {step < 12 && (
-                <div className="pt-6 border-t border-slate-200 flex items-center justify-between mt-auto">
+              {step < 10 && (
+                <div className="pt-6 border-t border-slate-200/50 flex items-center justify-between mt-auto">
                   <button 
                     onClick={prevStep}
                     disabled={step === 1}
-                    className={`px-5 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 ${
-                      step === 1 ? 'opacity-0 pointer-events-none' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm'
+                    className={`px-5 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 cursor-pointer ${
+                      step === 1 ? 'opacity-0 pointer-events-none' : 'neu-button text-slate-700'
                     }`}
                   >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Previous</span>
                   </button>
                   
-                  {step < 11 && step !== 10 && (
+                  {step < 9 && step !== 8 && (
                     <button 
                       onClick={nextStep}
                       disabled={isNextDisabled()}
-                      className={`px-6 py-2.5 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2 ${
+                      className={`px-6 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 cursor-pointer ${
                         isNextDisabled() 
-                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' 
-                          : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-md shadow-emerald-500/20'
+                          ? 'neu-pressed text-slate-400 cursor-not-allowed opacity-70' 
+                          : 'neu-button text-emerald-700'
                       }`}
                     >
                       <span>Proceed to Next</span>

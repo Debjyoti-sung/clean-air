@@ -87,3 +87,37 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
+
+/* --- Neumorphic Design System --- */
+/* Base background color: #f1f5f9 (slate-100) */
+/* Light shadow: #ffffff */
+/* Dark shadow: #cbd5e1 (slate-300) */
+
+.neu-flat {
+  background-color: #f1f5f9;
+  box-shadow: 8px 8px 16px #cbd5e1, -8px -8px 16px #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.neu-pressed {
+  background-color: #f1f5f9;
+  box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neu-button {
+  background-color: #f1f5f9;
+  box-shadow: 6px 6px 12px #cbd5e1, -6px -6px 12px #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.neu-button:hover {
+  box-shadow: 4px 4px 8px #cbd5e1, -4px -4px 8px #ffffff;
+}
+
+.neu-button:active, .neu-button-active {
+  box-shadow: inset 4px 4px 8px #cbd5e1, inset -4px -4px 8px #ffffff;
+  border-color: transparent;
+}
+

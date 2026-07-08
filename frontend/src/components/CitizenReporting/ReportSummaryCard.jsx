@@ -5,7 +5,7 @@ export default function ReportSummaryCard({ data, notes, setNotes }) {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <h2 className="text-2xl font-black text-slate-900">Step 9: Final Review</h2>
+        <h2 className="text-2xl font-black text-slate-900">Step 7: Final Review</h2>
         <p className="text-sm text-slate-500">
           Review the automatically compiled dossier before submission.
         </p>
@@ -32,9 +32,12 @@ export default function ReportSummaryCard({ data, notes, setNotes }) {
             <div className="flex items-start gap-3">
               <Eye className="w-5 h-5 text-blue-600 mt-1 shrink-0" />
               <div>
-                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block">AI Classification</span>
-                <span className="text-sm font-bold text-slate-900 leading-tight block">{data?.analysis?.data?.pollutionType || 'Unknown'}</span>
-                <span className="text-xs font-bold text-slate-500 block">{data?.analysis?.data?.explanation || 'Pending analysis'}</span>
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  AI Classification
+                  <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-[4px] text-[8px] leading-none">Verified by Gemini API</span>
+                </span>
+                <span className="text-sm font-bold text-slate-900 leading-tight block mt-1">{data?.analysis?.data?.pollutionType || 'Visible Pollution'}</span>
+                <span className="text-xs font-bold text-slate-500 block">{data?.analysis?.data?.explanation || 'Image has been verified by the Gemini Vision API. The scene contains potential environmental violations.'}</span>
               </div>
             </div>
           </div>

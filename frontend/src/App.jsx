@@ -24,7 +24,7 @@ import QuickAccess from './components/QuickAccess';
 import LivePollution from './components/LivePollution';
 import PlatformOverview from './components/PlatformOverview';
 import AIWorkflow from './components/AIWorkflow';
-import Statistics from './components/Statistics';
+
 import WhyCleanAir from './components/WhyCleanAir';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
@@ -32,6 +32,9 @@ import LocationModal from './components/LocationModal';
 import LiveMapPage from './components/LiveMapPage';
 import PredictionPage from './components/PredictionPage';
 import CitizenReporting from './components/CitizenReporting';
+import MunicipalityDashboard from './components/Municipality/MunicipalityDashboard';
+import AuthModal from './components/AuthModal';
+import { SupabaseService, supabase } from './services/supabase.service';
 
 export default function App() {
   // Global States
@@ -41,6 +44,42 @@ export default function App() {
   const [selectedLocation, setSelectedLocation] = useState(null); // { source, address, latitude, longitude, accuracy, lastUpdated }
   const [currentPage, setCurrentPage] = useState('landing'); // 'landing' | 'live-map' | 'prediction'
   const [isLocationLoading, setIsLocationLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('signin');
+
+  useEffect(() => {
+    // Initial fetch of logged-in user from Supabase session
+    SupabaseService.getUser().then(u => {
+      if (u) setUser(u);
+    });
+
+    // Listen to auth state changes (handles Google OAuth redirect, sign in/out)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await SupabaseService.signOut();
+      setUser(null);
+      addToast(
+        language === 'EN' ? 'Signed Out' : 'लॉग आउट किया गया',
+        language === 'EN' ? 'You have successfully signed out.' : 'आप सफलतापूर्वक लॉग आउट हो गए हैं।'
+      );
+    } catch (err) {
+      alert("Logout failed: " + err.message);
+    }
+  };
 
   useEffect(() => {
     if (selectedLocation) {
@@ -195,13 +234,19 @@ export default function App() {
 
 
       {/* 2. MAIN NAVIGATION */}
-      <MainNavigation
-        onSearchClick={() => setSearchOpen(true)}
-        onReportClick={() => setReportOpen(true)}
-        language={language}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
+      {currentPage !== 'municipality' && (
+        <MainNavigation
+          onSearchClick={() => setSearchOpen(true)}
+          onReportClick={() => setReportOpen(true)}
+          language={language}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          user={user}
+          onLoginClick={() => { setAuthModalMode('signin'); setAuthModalOpen(true); }}
+          onRegisterClick={() => { setAuthModalMode('signup'); setAuthModalOpen(true); }}
+          onLogoutClick={handleLogout}
+        />
+      )}
 
       {/* Page Routing */}
       {currentPage === 'landing' ? (
@@ -256,44 +301,7 @@ export default function App() {
             language={language}
           />
 
-          {/* 9. STATISTICS */}
-          <Statistics
-            language={language}
-          />
 
-          {/* Live SLA Progress Module */}
-          <section className="w-full py-16 bg-white px-4 md:px-8 border-b border-slate-200 max-w-[1440px] mx-auto">
-            <div className="max-w-4xl mx-auto bg-[#F8FAFC] border border-slate-200 p-6 md:p-8 rounded-2xl flex flex-col md:flex-row items-center gap-6 md:gap-10 text-left">
-              <div className="space-y-2 shrink-0 md:w-1/3">
-                <span className="text-[11px] font-extrabold uppercase text-[#15803D] tracking-wider flex items-center space-x-1.5">
-                  <Activity className="w-4 h-4" />
-                  <span>Municipal Performance SLA</span>
-                </span>
-                <h3 className="text-xl font-bold text-slate-900">National Ward Target</h3>
-                <p className="text-[13px] text-slate-500 font-medium">Resolution of severe violations within 2 hours of verification.</p>
-              </div>
-
-              <div className="w-full space-y-3">
-                <div className="flex justify-between items-center text-[13px] font-bold text-slate-700">
-                  <span>SLA Target: 85.0%</span>
-                  <span className="text-[#15803D]">Current: 78.4%</span>
-                </div>
-
-                {/* Custom Progress bar */}
-                <div className="w-full bg-slate-200 rounded-full h-3.5 overflow-hidden border border-slate-300">
-                  <div
-                    className="bg-gradient-to-r from-emerald-600 to-[#15803D] h-full rounded-full transition-all duration-1000"
-                    style={{ width: '78.4%' }}
-                  ></div>
-                </div>
-
-                <div className="flex justify-between text-[11.5px] text-slate-400 font-medium">
-                  <span>Sectors Monitored: 1,480</span>
-                  <span>Average Response: 2h 18m</span>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* 10. WHY CLEANAIR */}
           <WhyCleanAir
@@ -353,6 +361,14 @@ export default function App() {
           language={language}
           setSelectedLocation={setSelectedLocation}
           onBack={() => setCurrentPage('landing')}
+          user={user}
+          onUserChange={setUser}
+        />
+      ) : currentPage === 'municipality' ? (
+        <MunicipalityDashboard
+          language={language}
+          onBack={() => setCurrentPage('landing')}
+          user={user}
         />
       ) : (
         <PredictionPage
@@ -365,9 +381,11 @@ export default function App() {
       )}
 
       {/* 12. FOOTER */}
-      <Footer
-        language={language}
-      />
+      {currentPage !== 'municipality' && (
+        <Footer
+          language={language}
+        />
+      )}
 
       {/* Toast Notification Container */}
       <div className="fixed bottom-4 right-4 z-[100] flex flex-col space-y-2 select-none">
@@ -617,6 +635,16 @@ export default function App() {
         language={language}
         selectedLocation={selectedLocation}
         setSelectedLocation={setSelectedLocation}
+      />
+
+      {/* Global Authentication Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        defaultMode={authModalMode}
+        onClose={() => setAuthModalOpen(false)}
+        onAuthenticated={(usr) => {
+          setUser(usr);
+        }}
       />
 
     </div>

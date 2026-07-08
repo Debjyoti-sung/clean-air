@@ -17,9 +17,14 @@ async function initEarthEngine(): Promise<void> {
   isInitializing = true;
 
   try {
-    const keyPath = path.resolve('../api_json.json');
+    let keyPath = path.resolve('../api_json.json');
     if (!fs.existsSync(keyPath)) {
-      throw new Error('api_json.json not found in root directory');
+      const rootPath = path.resolve('api_json.json');
+      if (fs.existsSync(rootPath)) {
+        keyPath = rootPath;
+      } else {
+        throw new Error('api_json.json not found in root directory or parent directory');
+      }
     }
     const privateKey = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
 
@@ -33,7 +38,7 @@ async function initEarthEngine(): Promise<void> {
         }, (e: any) => {
           isInitializing = false;
           reject(new Error(`EE Initialization error: ${e}`));
-        }, null, privateKey.project_id);
+        });
       }, (e: any) => {
         isInitializing = false;
         reject(new Error(`EE Authentication error: ${e}`));
@@ -49,7 +54,7 @@ export const EarthEngineService = {
   /**
    * Fetch satellite-derived environmental data (NDVI, Elevation, etc)
    */
-  getSatelliteData: async (lat: number, lng: number): Promise<any> => {
+  getSatelliteData: async (lat: number, lng: number, bufferRange: number = 5000): Promise<any> => {
     try {
       await initEarthEngine();
       
@@ -88,7 +93,7 @@ export const EarthEngineService = {
       let thumbUrl = '';
       try {
         const rgbImage = s2.visualize({bands: ['B4', 'B3', 'B2'], min: 0, max: 3000});
-        const buffer = point.buffer(5000); // 5km buffer
+        const buffer = point.buffer(bufferRange); // Dynamic buffer range
         thumbUrl = await new Promise<string>((resolve, reject) => {
           rgbImage.getThumbURL({
             dimensions: 800,
@@ -99,8 +104,8 @@ export const EarthEngineService = {
             else resolve(url);
           });
         });
-      } catch (e) {
-        logger.warn('Could not generate GEE thumbnail: ' + (e as any).message);
+      } catch (e: any) {
+        logger.warn('Could not generate GEE thumbnail: ' + (e.message || e));
       }
 
       return {
@@ -113,15 +118,16 @@ export const EarthEngineService = {
       };
 
     } catch (error: any) {
-      logger.error('Google Earth Engine API request failed. Using fallback data:', error.message);
-      return getMockSatelliteData(lat, lng);
+      logger.error('Google Earth Engine API request failed. Using fallback data:', error.message || error);
+      return getMockSatelliteData(lat, lng, bufferRange);
     }
   }
 };
 
-function getMockSatelliteData(lat: number, lng: number) {
-  // Generate a live satellite image from ESRI World Imagery using a bounding box
-  const offset = 0.05; // ~5km radius
+function getMockSatelliteData(lat: number, lng: number, bufferRange: number = 5000) {
+  // Generate a live satellite image from ESRI World Imagery using a bounding box.
+  // 1 degree of latitude is ~111,000 meters.
+  const offset = bufferRange / 111000;
   const minLng = (lng - offset).toFixed(4);
   const minLat = (lat - offset).toFixed(4);
   const maxLng = (lng + offset).toFixed(4);

@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   RefreshCw
 } from 'lucide-react';
+import { manualLocationData } from '../data/indianLocations';
 
 export const coordinatesMapping = {
   'West Bengal_North 24 Parganas_Bidhannagar': { lat: 22.5726, lng: 88.3639 },
@@ -47,30 +48,7 @@ export const getDisplayNameFromCoords = (lat, lng) => {
 };
 
 export default function LocationModal({ isOpen, onClose, language, selectedLocation, setSelectedLocation }) {
-  const manualLocationData = {
-    'West Bengal': {
-      'North 24 Parganas': ['Bidhannagar', 'Rajarhat', 'Barasat', 'Barrackpore'],
-      'South 24 Parganas': ['Alipore', 'Garia', 'Sonarpur'],
-      'Kolkata': ['Salt Lake', 'Lake Town', 'Park Street', 'Kolkata'],
-      'Howrah': ['Howrah', 'Shibpur', 'Liluah']
-    },
-    'Maharashtra': {
-      'Pune': ['Aundh', 'Hinjawadi', 'Kothrud', 'Viman Nagar'],
-      'Mumbai City': ['Colaba', 'Dadar', 'Chembur', 'Nariman Point'],
-      'Nagpur': ['Dharampeth', 'Sadar'],
-      'Thane': ['Thane West', 'Kalyan']
-    },
-    'Delhi': {
-      'New Delhi': ['Connaught Place', 'Chanakyapuri', 'Vasant Kunj'],
-      'South Delhi': ['Saket', 'Hauz Khas', 'Greater Kailash'],
-      'North Delhi': ['Civil Lines', 'Model Town'],
-      'West Delhi': ['Dwarka', 'Janakpuri']
-    },
-    'Karnataka': {
-      'Bangalore Urban': ['Indiranagar', 'Yelahanka', 'Electronic City', 'Koramangala'],
-      'Mysore': ['Gokulam', 'Jayalakshmipuram']
-    }
-  };
+
 
   // Manual location form states
   const [manualState, setManualState] = useState('');
@@ -228,7 +206,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-4xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-scaleIn text-left flex flex-col max-h-[90vh]">
+      <div className="neu-flat w-full max-w-4xl rounded-3xl overflow-hidden animate-scaleIn text-left flex flex-col max-h-[90vh]">
         
         {/* Modal Header */}
         <div className="bg-[#15803D] text-white p-4 flex justify-between items-center shrink-0">
@@ -261,14 +239,14 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
             {/* 1. EMPTY STATE */}
             {locationMode === 'empty' && (
               <div className="space-y-6 pt-2">
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center space-x-3 text-slate-600 font-semibold text-[14.5px]">
+                <div className="neu-pressed rounded-2xl p-4 flex items-center space-x-3 text-slate-600 font-semibold text-[14.5px]">
                   <span className="text-lg">📍</span>
                   <span>No location selected.</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* OPTION 1 */}
-                  <div className="border border-slate-200 rounded-xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-350 transition-colors">
+                  <div className="neu-pressed rounded-3xl p-6 flex flex-col justify-between space-y-4 border border-transparent hover:border-slate-200 transition-colors">
                     <div className="space-y-1.5">
                       <h4 className="text-[15px] font-extrabold text-slate-800 flex items-center space-x-1.5">
                         <span>📍</span>
@@ -281,7 +259,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                     <button
                       onClick={handleGpsDetect}
                       type="button"
-                      className="w-full text-center text-[13.5px] font-bold text-white bg-[#15803D] hover:bg-[#166534] py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm hover:shadow cursor-pointer"
+                      className="w-full text-center text-[13.5px] font-bold text-emerald-600 neu-button py-2.5 rounded-xl transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <Compass className="w-4 h-4 animate-pulse" />
                       <span>Detect My Location</span>
@@ -289,7 +267,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                   </div>
 
                   {/* OPTION 2 */}
-                  <div className="border border-slate-200 rounded-xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-350 transition-colors">
+                  <div className="neu-pressed rounded-3xl p-6 flex flex-col justify-between space-y-4 border border-transparent hover:border-slate-200 transition-colors">
                     <div className="space-y-1.5">
                       <h4 className="text-[15px] font-extrabold text-slate-800 flex items-center space-x-1.5">
                         <span>📌</span>
@@ -302,7 +280,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                     <button
                       onClick={() => changeMode('manual_form')}
                       type="button"
-                      className="w-full text-center text-[13.5px] font-bold text-slate-700 bg-slate-50 border border-slate-300 hover:bg-slate-100 py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full text-center text-[13.5px] font-bold text-slate-500 neu-button py-2.5 rounded-xl transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <MapPin className="w-4 h-4 text-slate-500" />
                       <span>Enter Location Manually</span>
@@ -343,7 +321,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                         setManualDistrict('');
                         setManualCity('');
                       }}
-                      className="w-full bg-slate-50 border border-slate-300 focus:border-[#15803D] focus:outline-none text-[13.5px] text-slate-800 rounded-lg px-3 py-2.5 transition-colors font-semibold"
+                      className="w-full neu-pressed border border-transparent focus:border-emerald-500/30 focus:outline-none text-[13.5px] text-slate-800 rounded-xl px-3 py-2.5 transition-colors font-semibold"
                     >
                       <option value="">Select State</option>
                       {Object.keys(manualLocationData).map(state => (
@@ -363,7 +341,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                         setManualDistrict(e.target.value);
                         setManualCity('');
                       }}
-                      className="w-full bg-slate-50 border border-slate-300 focus:border-[#15803D] focus:outline-none text-[13.5px] text-slate-800 rounded-lg px-3 py-2.5 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full neu-pressed border border-transparent focus:border-emerald-500/30 focus:outline-none text-[13.5px] text-slate-800 rounded-xl px-3 py-2.5 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <option value="">{manualState ? 'Select District' : 'Select State first'}</option>
                       {manualState && Object.keys(manualLocationData[manualState] || {}).map(district => (
@@ -372,21 +350,18 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                     </select>
                   </div>
 
-                  {/* City Dropdown */}
+                  {/* City Input */}
                   <div className="space-y-1">
                     <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider block">City / Town / Village</label>
-                    <select
+                    <input
+                      type="text"
                       required
                       disabled={!manualDistrict}
+                      placeholder={manualDistrict ? "Enter your city or village" : "Select District first"}
                       value={manualCity}
                       onChange={(e) => setManualCity(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 focus:border-[#15803D] focus:outline-none text-[13.5px] text-slate-800 rounded-lg px-3 py-2.5 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">{manualDistrict ? 'Select City / Town / Village' : 'Select District first'}</option>
-                      {manualDistrict && (manualLocationData[manualState]?.[manualDistrict] || []).map(city => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
+                      className="w-full neu-pressed border border-transparent focus:border-emerald-500/30 focus:outline-none text-[13.5px] text-slate-800 rounded-xl px-3 py-2.5 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
                   </div>
                 </div>
 
@@ -400,7 +375,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                       placeholder="e.g. House No. 25, Near City Centre 1, Sector V"
                       value={manualHouse}
                       onChange={(e) => setManualHouse(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 focus:border-[#15803D] focus:outline-none text-[13.5px] text-slate-800 rounded-lg px-3 py-2.5 transition-colors font-medium"
+                      className="w-full neu-pressed border border-transparent focus:border-emerald-500/30 focus:outline-none text-[13.5px] text-slate-800 rounded-xl px-3 py-2.5 transition-colors font-medium"
                     />
                   </div>
 
@@ -412,7 +387,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                       placeholder="e.g. 700091"
                       value={manualPin}
                       onChange={(e) => setManualPin(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 focus:border-[#15803D] focus:outline-none text-[13.5px] text-slate-800 rounded-lg px-3 py-2.5 transition-colors font-medium"
+                      className="w-full neu-pressed border border-transparent focus:border-emerald-500/30 focus:outline-none text-[13.5px] text-slate-800 rounded-xl px-3 py-2.5 transition-colors font-medium"
                     />
                   </div>
                 </div>
@@ -421,13 +396,13 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                   <button
                     type="button"
                     onClick={() => changeMode(selectedLocation ? 'success' : 'empty')}
-                    className="text-[13.5px] font-semibold text-slate-700 hover:bg-slate-100 border border-slate-350 px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
+                    className="text-[13.5px] font-semibold text-slate-500 neu-button px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="text-[13.5px] font-bold text-white bg-[#15803D] hover:bg-[#166534] px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-colors cursor-pointer"
+                    className="text-[13.5px] font-bold text-emerald-600 neu-button px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
                   >
                     Apply Location
                   </button>
@@ -437,7 +412,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
 
             {/* 4. SUCCESS STATE: DISPLAY COMPILING LOCATION CARD */}
             {locationMode === 'success' && selectedLocation && (
-              <div className="space-y-5">
+              <div className="neu-pressed rounded-3xl p-6 space-y-5">
 
                 {/* Header status bar */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3.5 gap-2">
@@ -512,7 +487,7 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
                   <button
                     onClick={handleResetLocation}
                     type="button"
-                    className="text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-1.5 border border-slate-300 rounded-lg px-3.5 py-2 hover:bg-slate-50 transition-colors shadow-sm bg-white cursor-pointer"
+                    className="text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-1.5 neu-button rounded-xl px-4 py-2 transition-colors cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
                     <span>Provide Different Location</span>

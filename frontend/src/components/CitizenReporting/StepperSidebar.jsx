@@ -9,16 +9,14 @@ export default function StepperSidebar({ currentStep, language = 'EN' }) {
     { num: 4, label: language === 'EN' ? 'Air Quality' : 'एक्यूआई विश्लेषण' },
     { num: 5, label: language === 'EN' ? 'Weather' : 'मौसम विवरण' },
     { num: 6, label: language === 'EN' ? 'Satellite Scan' : 'सैटेलाइट स्कैन' },
-    { num: 7, label: language === 'EN' ? 'AI Vision' : 'एआई विश्लेषण' },
-    { num: 8, label: language === 'EN' ? 'Severity Engine' : 'जोखिम रेटिंग' },
-    { num: 9, label: language === 'EN' ? 'Review Report' : 'समीक्षा' },
-    { num: 10, label: language === 'EN' ? 'Authentication' : 'प्रमाणीकरण' },
-    { num: 11, label: language === 'EN' ? 'Submission' : 'प्रस्तुति' }
+    { num: 7, label: language === 'EN' ? 'Review Report' : 'समीक्षा' },
+    { num: 8, label: language === 'EN' ? 'Authentication' : 'प्रमाणीकरण' },
+    { num: 9, label: language === 'EN' ? 'Submission' : 'प्रस्तुति' }
   ];
 
   return (
     <div className="w-full lg:w-[260px] shrink-0">
-      <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-[2rem] p-5 space-y-4 shadow-sm">
+      <div className="neu-flat rounded-[2rem] p-5 space-y-4">
         <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block px-3">
           Pipeline Status
         </span>
@@ -26,26 +24,26 @@ export default function StepperSidebar({ currentStep, language = 'EN' }) {
           {stepsList.map((s) => {
             const isActive = currentStep === s.num;
             const isCompleted = currentStep > s.num;
-            // Hide step 12 from sidebar since it's just success screen
-            if (s.num > 11) return null;
+            // Hide step 10 from sidebar since it's just success screen
+            if (s.num > 9) return null;
 
             return (
               <div 
                 key={s.num}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all duration-300 min-w-[130px] lg:min-w-0 ${
                   isActive 
-                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm font-bold' 
+                    ? 'neu-pressed text-emerald-700 font-bold' 
                     : isCompleted 
-                      ? 'text-slate-700 font-medium hover:bg-slate-50' 
-                      : 'text-slate-400 opacity-70'
+                      ? 'text-slate-700 font-medium hover:neu-flat' 
+                      : 'text-slate-500 font-medium hover:neu-flat cursor-pointer'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold transition-all duration-300 ${
                   isActive 
-                    ? 'bg-emerald-600 text-white shadow-sm' 
+                    ? 'neu-button-active bg-emerald-600 text-white' 
                     : isCompleted 
-                      ? 'bg-emerald-100 text-emerald-600 border border-emerald-200' 
-                      : 'bg-slate-100 text-slate-400 border border-slate-200'
+                      ? 'neu-flat text-emerald-600' 
+                      : 'neu-pressed text-slate-500'
                 }`}>
                   {isCompleted ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : s.num}
                 </div>

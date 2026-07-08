@@ -79,7 +79,7 @@ export default function SeverityCard({ coords, analysisData }) {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <h2 className="text-2xl font-black text-slate-900">Step 8: Multi-Source Severity Engine</h2>
+        <h2 className="text-2xl font-black text-slate-900">Step 7: Multi-Source Severity Engine</h2>
         <p className="text-sm text-slate-500">
           Synthesizing AI Vision, Weather, Satellite, and Nearby Infrastructure data to calculate priority.
         </p>

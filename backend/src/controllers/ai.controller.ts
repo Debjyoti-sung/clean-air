@@ -43,7 +43,7 @@ export const AIController = {
 Total Processing Time: ${(totalTimeMs / 1000).toFixed(2)} seconds
 - Upload Handling: ${uploadTime - startTime} ms
 - Image Preprocessing: ${processTime - uploadTime} ms
-- Mistral API: ${apiTime - processTime} ms
+- Gemini API: ${apiTime - processTime} ms
 - Original Size: ${(file.size / 1024).toFixed(1)} KB
 - Optimized Size: ${(optimizedBuffer.length / 1024).toFixed(1)} KB
       `);

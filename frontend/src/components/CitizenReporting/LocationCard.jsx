@@ -182,7 +182,7 @@ export default function LocationCard({ onLocationSelected, language = 'EN' }) {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               rows="2"
-              className="w-full bg-white border border-slate-200 focus:border-emerald-500/40 rounded-2xl p-3 text-slate-700 font-bold text-sm focus:outline-none focus:ring-0 resize-none transition shadow-sm"
+              className="w-full neu-pressed border-transparent focus:border-emerald-500/40 rounded-2xl p-3 text-slate-700 font-bold text-sm focus:outline-none focus:ring-0 resize-none transition"
               placeholder="Enter incident address manually or use GPS..."
             />
           </div>
@@ -190,13 +190,13 @@ export default function LocationCard({ onLocationSelected, language = 'EN' }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <span className="text-[10.5px] font-extrabold uppercase text-slate-500">Latitude</span>
-              <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-3 text-sm font-mono text-emerald-600 font-bold h-12 flex items-center">
+              <div className="neu-pressed border-transparent rounded-xl p-3 text-sm font-mono text-emerald-600 font-bold h-12 flex items-center">
                 {coords.lat ? `${coords.lat}° N` : '--'}
               </div>
             </div>
             <div className="space-y-1">
               <span className="text-[10.5px] font-extrabold uppercase text-slate-500">Longitude</span>
-              <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-3 text-sm font-mono text-emerald-600 font-bold h-12 flex items-center">
+              <div className="neu-pressed border-transparent rounded-xl p-3 text-sm font-mono text-emerald-600 font-bold h-12 flex items-center">
                 {coords.lng ? `${coords.lng}° E` : '--'}
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function LocationCard({ onLocationSelected, language = 'EN' }) {
             <button
               onClick={handleGPSDetect}
               disabled={isDetectingGPS}
-              className="px-4 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-500/20"
+              className="px-4 py-2.5 text-xs font-black text-emerald-700 neu-button rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {isDetectingGPS ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
               <span>Use My GPS Location</span>
@@ -222,7 +222,7 @@ export default function LocationCard({ onLocationSelected, language = 'EN' }) {
                 <button
                   key={city}
                   onClick={() => setDemoRegion(city)}
-                  className="px-3.5 py-2 bg-white border border-slate-200 hover:border-slate-300 text-xs font-bold text-slate-700 rounded-xl transition cursor-pointer active:scale-95 shadow-sm"
+                  className="px-3.5 py-2 neu-button text-xs font-bold text-slate-700 rounded-xl transition cursor-pointer"
                 >
                   🇮🇳 {city}
                 </button>
@@ -231,22 +231,22 @@ export default function LocationCard({ onLocationSelected, language = 'EN' }) {
           </div>
         </div>
 
-        <div className="bg-white/80 border border-slate-200 shadow-sm rounded-3xl p-5 relative overflow-hidden h-[340px]">
+        <div className="neu-flat rounded-3xl p-5 relative overflow-hidden h-[340px]">
           <div className="flex items-center justify-between mb-4 relative z-10">
-            <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 bg-white/80 backdrop-blur px-2 py-1 rounded-md">
+            <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 px-2 py-1">
               <Layers className="w-3.5 h-3.5 text-emerald-600" />
               <span>Ola / Satellite Map Layer</span>
             </span>
-            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <div className="flex neu-pressed p-0.5 rounded-lg border border-transparent">
               <button 
                 onClick={() => setMapMode('terrain')} 
-                className={`text-[10px] font-bold px-2.5 py-1 rounded transition ${mapMode === 'terrain' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md transition ${mapMode === 'terrain' ? 'neu-flat text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 Terrain
               </button>
               <button 
                 onClick={() => setMapMode('satellite')} 
-                className={`text-[10px] font-bold px-2.5 py-1 rounded transition ${mapMode === 'satellite' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md transition ${mapMode === 'satellite' ? 'neu-flat text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 Satellite
               </button>

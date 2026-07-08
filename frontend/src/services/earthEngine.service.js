@@ -9,10 +9,10 @@ export const EarthEngineService = {
    * @param {number} lat 
    * @param {number} lng 
    */
-  getSatelliteData: async (lat, lng) => {
+  getSatelliteData: async (lat, lng, buffer = 5000) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/satellite?lat=${lat}&lng=${lng}`
+        `http://localhost:5000/api/satellite?lat=${lat}&lng=${lng}&buffer=${buffer}`
       );
       
       if (!response.ok) throw new Error("Failed to fetch Earth Engine data from backend");

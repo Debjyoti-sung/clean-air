@@ -74,12 +74,12 @@ export default function UploadCard({ onImageUploaded, language = 'EN' }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-2">
+      <div className="grid grid-cols-1 gap-8 items-center pt-2 max-w-2xl mx-auto w-full">
         <div 
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={uploadedImage ? undefined : triggerFileInput}
-          className={`border-2 border-dashed border-slate-300 rounded-3xl p-8 bg-white/50 text-center relative flex flex-col items-center justify-center min-h-[220px] transition-all hover:border-emerald-500/40 shadow-sm ${!uploadedImage ? 'cursor-pointer' : ''}`}
+          className={`neu-pressed rounded-3xl p-8 text-center relative flex flex-col items-center justify-center min-h-[220px] transition-all border border-transparent hover:border-emerald-500/30 ${!uploadedImage ? 'cursor-pointer' : ''}`}
         >
           <input 
             type="file" 
@@ -104,7 +104,7 @@ export default function UploadCard({ onImageUploaded, language = 'EN' }) {
                     setUploadedImage(null);
                     onImageUploaded(null);
                   }}
-                  className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl hover:bg-red-100 transition cursor-pointer"
+                  className="text-xs font-bold text-red-600 neu-button px-3 py-1.5 rounded-xl transition cursor-pointer"
                 >
                   Remove
                 </button>
@@ -112,50 +112,18 @@ export default function UploadCard({ onImageUploaded, language = 'EN' }) {
             </div>
           ) : (
             <div className="space-y-4 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+              <div className="w-16 h-16 rounded-full neu-flat flex items-center justify-center text-slate-400">
                 <Upload className="w-6 h-6 text-slate-400" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 mt-4 text-center">
                 <span className="text-xs font-bold text-slate-700 block">Drag and drop file here, or click to browse</span>
                 <span className="text-[10px] text-slate-500 block">PNG, JPG, or WEBP up to 10MB</span>
-              </div>
-              <div className="flex flex-wrap gap-2.5 justify-center pt-2" onClick={e => e.stopPropagation()}>
-                <button 
-                  onClick={() => simulateUpload('dust')}
-                  className="px-4 py-2 text-[11.5px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition cursor-pointer"
-                >
-                  Mock Dust Upload
-                </button>
-                <button 
-                  onClick={() => simulateUpload('garbage')}
-                  className="px-4 py-2 text-[11.5px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition cursor-pointer"
-                >
-                  Mock Fire Upload
-                </button>
               </div>
             </div>
           )}
         </div>
 
-        <div className="bg-white/80 border border-slate-200 rounded-3xl p-6 min-h-[220px] flex flex-col justify-between text-left space-y-4 shadow-sm">
-          <div className="space-y-2">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Camera Device Ingest</span>
-            <h4 className="text-md font-bold text-slate-900">Live View Simulator</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Simulate sensor array camera alignment checks. Clicking camera triggers simulates visual target bounds ingestion and registers telemetry indexes.
-            </p>
-          </div>
-          <div className="bg-[#f1f5f9] rounded-2xl p-4 flex items-center justify-between border border-slate-200">
-            <div className="flex items-center gap-3">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              <span className="text-xs font-mono text-slate-700">Device ID: INGEST_CAM_01</span>
-            </div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase bg-white px-2 py-0.5 rounded border border-slate-200">Ready</span>
-          </div>
-        </div>
+
       </div>
     </div>
   );
