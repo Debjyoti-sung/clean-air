@@ -1,4 +1,4 @@
-export const mockReports = [
+const defaultMockReports = [
   {
     id: "AER-2026-00124",
     citizenName: "Rahul Sharma",
@@ -150,6 +150,12 @@ export const mockReports = [
     resourceRequest: null
   }
 ];
+
+export const mockReports = JSON.parse(localStorage.getItem('mockReports')) || defaultMockReports;
+
+export const saveMockReports = () => {
+  localStorage.setItem('mockReports', JSON.stringify(mockReports));
+};
 
 export const mockOfficers = [
   { id: "OFF-01", name: "Arjun Singh", department: "Sanitation Dept", activeCases: 3, rating: "4.8", contact: "+91 98223 11223", status: "Active" },

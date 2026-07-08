@@ -4,7 +4,7 @@ import { CheckCircle2, ArrowRight, MapPin, User, Mail, Phone } from 'lucide-reac
 export default function SuccessCard({ trackingId, reportData }) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const localImageUrl = reportData?.image ? URL.createObjectURL(reportData.image) : '';
+  const localImageUrl = reportData?.image || '';
   const citizenName = reportData?.user?.user_metadata?.name || reportData?.user?.user_metadata?.full_name || reportData?.user?.email?.split('@')[0] || "Citizen";
   const citizenEmail = reportData?.user?.email || "N/A";
   const citizenPhone = reportData?.user?.user_metadata?.phone || "N/A";

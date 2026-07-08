@@ -13,7 +13,7 @@ import SuccessCard from './CitizenReporting/SuccessCard';
 import { SupabaseService } from '../services/supabase.service';
 import { EmailService } from '../services/email.service';
 import { useEffect } from 'react';
-import { mockReports } from './Municipality/mockData';
+import { mockReports, saveMockReports } from './Municipality/mockData';
 
 export default function CitizenReporting({ language = 'EN', onBack, user, onUserChange }) {
   const [step, setStep] = useState(1);
@@ -85,6 +85,7 @@ export default function CitizenReporting({ language = 'EN', onBack, user, onUser
       };
 
       mockReports.unshift(newReport);
+      saveMockReports();
       
       setReportData(prev => ({ ...prev, trackingId: trackingId }));
       
