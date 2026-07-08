@@ -49,14 +49,14 @@ export default function MunicipalityDashboard({ language, onBack, user }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9] flex font-sans text-slate-800 antialiased overflow-x-hidden relative">
+    <div className="h-screen bg-[#f1f5f9] flex font-sans text-slate-800 antialiased overflow-hidden relative">
       <MunicipalitySidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         isOpen={isSidebarOpen} 
       />
       
-      <div className={`flex-1 transition-all duration-300 flex flex-col min-h-screen relative z-10 ${isSidebarOpen ? 'ml-72' : 'ml-0'}`}>
+      <div className={`flex-1 transition-all duration-300 flex flex-col h-screen relative z-10 w-full box-border ${isSidebarOpen ? 'pl-72' : 'pl-0'}`}>
         <MunicipalityTopNav 
           onBack={onBack} 
           user={user} 
@@ -65,7 +65,7 @@ export default function MunicipalityDashboard({ language, onBack, user }) {
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
         
-        <main className="flex-1 p-4 md:p-8 overflow-x-auto custom-scrollbar">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto overflow-x-hidden custom-scrollbar">
           {renderContent()}
         </main>
       </div>
