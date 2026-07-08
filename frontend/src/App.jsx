@@ -51,22 +51,39 @@ export default function App() {
     sessionStorage.setItem('current_page', currentPage);
   }, [currentPage]);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
-  const [user, setUser] = useState(null);
+  const [citizenUser, setCitizenUser] = useState(null);
+  const [municipalityUser, setMunicipalityUser] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('signin');
 
   useEffect(() => {
     // Initial fetch of logged-in user from Supabase session
     SupabaseService.getUser().then(u => {
-      if (u) setUser(u);
+      if (u) {
+        if (u.email.toLowerCase() === 'debjyotibarikgdg@gmail.com') {
+          setCitizenUser(u);
+          setMunicipalityUser(null);
+        } else {
+          setCitizenUser(null);
+          setMunicipalityUser(u);
+        }
+      }
     });
 
     // Listen to auth state changes (handles Google OAuth redirect, sign in/out)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser(session.user);
+      const sessionUser = session?.user || null;
+      if (sessionUser) {
+        if (sessionUser.email.toLowerCase() === 'debjyotibarikgdg@gmail.com') {
+          setCitizenUser(sessionUser);
+          setMunicipalityUser(null);
+        } else {
+          setCitizenUser(null);
+          setMunicipalityUser(sessionUser);
+        }
       } else {
-        setUser(null);
+        setCitizenUser(null);
+        setMunicipalityUser(null);
       }
     });
 
@@ -78,7 +95,8 @@ export default function App() {
   const handleLogout = async () => {
     try {
       await SupabaseService.signOut();
-      setUser(null);
+      setCitizenUser(null);
+      setMunicipalityUser(null);
       addToast(
         language === 'EN' ? 'Signed Out' : 'लॉग आउट किया गया',
         language === 'EN' ? 'You have successfully signed out.' : 'आप सफलतापूर्वक लॉग आउट हो गए हैं।'
@@ -248,7 +266,7 @@ export default function App() {
           language={language}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          user={user}
+          user={citizenUser}
           onLoginClick={() => { setAuthModalMode('signin'); setAuthModalOpen(true); }}
           onRegisterClick={() => { setAuthModalMode('signup'); setAuthModalOpen(true); }}
           onLogoutClick={handleLogout}
@@ -368,22 +386,27 @@ export default function App() {
           language={language}
           setSelectedLocation={setSelectedLocation}
           onBack={() => setCurrentPage('landing')}
-          user={user}
-          onUserChange={setUser}
+          user={citizenUser}
+          onUserChange={setCitizenUser}
         />
       ) : currentPage === 'municipality' ? (
-        (!user || user.email.toLowerCase() === 'debjyotibarikgdg@gmail.com') ? (
+        (!municipalityUser) ? (
           <MunicipalityLogin
             onBack={() => setCurrentPage('landing')}
-            onLogin={(usr) => setUser(usr)}
-            user={user}
+            onLogin={(usr) => {
+              if (usr && usr.email.toLowerCase() !== 'debjyotibarikgdg@gmail.com') {
+                setMunicipalityUser(usr);
+                setCitizenUser(null);
+              }
+            }}
+            user={municipalityUser}
             onLogout={handleLogout}
           />
         ) : (
           <MunicipalityDashboard
             language={language}
             onBack={() => setCurrentPage('landing')}
-            user={user}
+            user={municipalityUser}
           />
         )
       ) : (
@@ -659,7 +682,15 @@ export default function App() {
         defaultMode={authModalMode}
         onClose={() => setAuthModalOpen(false)}
         onAuthenticated={(usr) => {
-          setUser(usr);
+          if (usr) {
+            if (usr.email.toLowerCase() === 'debjyotibarikgdg@gmail.com') {
+              setCitizenUser(usr);
+              setMunicipalityUser(null);
+            } else {
+              setCitizenUser(null);
+              setMunicipalityUser(usr);
+            }
+          }
         }}
       />
 
