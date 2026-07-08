@@ -12,7 +12,7 @@ export const EarthEngineService = {
   getSatelliteData: async (lat, lng, buffer = 5000) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/satellite?lat=${lat}&lng=${lng}&buffer=${buffer}`
+        `https://clean-air-w252.onrender.com/api/satellite?lat=${lat}&lng=${lng}&buffer=${buffer}`
       );
       
       if (!response.ok) throw new Error("Failed to fetch Earth Engine data from backend");

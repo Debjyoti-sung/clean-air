@@ -12,7 +12,7 @@ export const WeatherService = {
   getCurrentWeather: async (lat, lng) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/weather?lat=${lat}&lng=${lng}`
+        `https://clean-air-w252.onrender.com/api/weather?lat=${lat}&lng=${lng}`
       );
       
       if (!response.ok) throw new Error("Failed to fetch Weather data from backend");

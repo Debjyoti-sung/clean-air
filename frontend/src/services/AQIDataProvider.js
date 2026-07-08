@@ -2,7 +2,7 @@
 // Abstraction layer for AQI data — swap out the provider without touching UI
 
 const AQICN_TOKEN = import.meta.env.VITE_AQICN_TOKEN || 'demo';
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://clean-air-w252.onrender.com';
 
 export const AQIDataProvider = {
   /**

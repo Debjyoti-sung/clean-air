@@ -12,7 +12,7 @@ export const AirQualityService = {
   getAirQuality: async (lat, lng) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/environment?lat=${lat}&lng=${lng}&radius=2000`
+        `https://clean-air-w252.onrender.com/api/environment?lat=${lat}&lng=${lng}&radius=2000`
       );
       
       if (!response.ok) throw new Error("Failed to fetch Air Quality from backend gateway");

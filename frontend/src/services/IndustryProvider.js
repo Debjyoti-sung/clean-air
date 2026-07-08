@@ -1,5 +1,5 @@
 // services/IndustryProvider.js
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://clean-air-w252.onrender.com';
 
 export const IndustryProvider = {
   async fetchNearby(lat, lon, radius = 10) {

@@ -22,7 +22,7 @@ export const VisionService = {
 
       // 2. Send to backend AI Service
       console.log('[VisionService] Sending image to backend...');
-      const response = await fetch('http://localhost:5000/api/ai/analyze-image', {
+      const response = await fetch('https://clean-air-w252.onrender.com/api/ai/analyze-image', {
         method: 'POST',
         body: formData
       });

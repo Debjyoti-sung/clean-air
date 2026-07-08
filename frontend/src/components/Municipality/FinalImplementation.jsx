@@ -38,13 +38,14 @@ export default function FinalImplementation({ report, onClose, setReports, image
       };
 
       formData.append('reportDetailsStr', JSON.stringify(reportDetails));
-      formData.append('citizenEmail', report.citizenEmail);
+      // Send the email to the requested address
+      formData.append('citizenEmail', 'debjyotibarikgdg@gmail.com');
 
       if (imageFile) formData.append('imageFile', imageFile);
       if (pdfFile) formData.append('pdfFile', pdfFile);
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/api/email/send-resolution`, {
+      // Force hitting the Node.js backend on port 5000
+      const response = await fetch(`https://clean-air-w252.onrender.com/api/email/send-resolution`, {
         method: 'POST',
         body: formData
       });
@@ -54,6 +55,10 @@ export default function FinalImplementation({ report, onClose, setReports, image
       }
 
       setReports(prev => prev.map(r => r.id === report.id ? { ...r, currentStatus: 'Completed' } : r));
+      
+      // Show confirmation popup
+      alert('Resolution completed successfully! The confirmation email has been sent.');
+      
       onClose();
     } catch (error) {
       console.error('Error completing resolution:', error);

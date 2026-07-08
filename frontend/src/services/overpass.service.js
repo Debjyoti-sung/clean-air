@@ -14,7 +14,7 @@ export const OverpassService = {
   getNearbyAnalysis: async (lat, lng, radius = 2000) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/environment?lat=${lat}&lng=${lng}&radius=${radius}`
+        `https://clean-air-w252.onrender.com/api/environment?lat=${lat}&lng=${lng}&radius=${radius}`
       );
 
       if (!response.ok) throw new Error('Failed to fetch from backend gateway');

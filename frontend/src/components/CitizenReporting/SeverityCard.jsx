@@ -11,7 +11,7 @@ export default function SeverityCard({ coords, analysisData }) {
     let isMounted = true;
     setLoading(true);
 
-    fetch(`http://localhost:5000/api/environment?lat=${coords.lat}&lng=${coords.lng}&radius=2000`)
+    fetch(`https://clean-air-w252.onrender.com/api/environment?lat=${coords.lat}&lng=${coords.lng}&radius=2000`)
       .then(res => res.json())
       .then(resData => {
         if (isMounted) {
