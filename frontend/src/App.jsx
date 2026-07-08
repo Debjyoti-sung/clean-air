@@ -33,6 +33,7 @@ import LiveMapPage from './components/LiveMapPage';
 import PredictionPage from './components/PredictionPage';
 import CitizenReporting from './components/CitizenReporting';
 import MunicipalityDashboard from './components/Municipality/MunicipalityDashboard';
+import MunicipalityLogin from './components/Municipality/MunicipalityLogin';
 import AuthModal from './components/AuthModal';
 import { SupabaseService, supabase } from './services/supabase.service';
 
@@ -371,11 +372,20 @@ export default function App() {
           onUserChange={setUser}
         />
       ) : currentPage === 'municipality' ? (
-        <MunicipalityDashboard
-          language={language}
-          onBack={() => setCurrentPage('landing')}
-          user={user}
-        />
+        (!user || user.email.toLowerCase() === 'debjyotibarikgdg@gmail.com') ? (
+          <MunicipalityLogin
+            onBack={() => setCurrentPage('landing')}
+            onLogin={(usr) => setUser(usr)}
+            user={user}
+            onLogout={handleLogout}
+          />
+        ) : (
+          <MunicipalityDashboard
+            language={language}
+            onBack={() => setCurrentPage('landing')}
+            user={user}
+          />
+        )
       ) : (
         <PredictionPage
           language={language}
