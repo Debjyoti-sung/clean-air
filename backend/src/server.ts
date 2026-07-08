@@ -46,6 +46,7 @@ const limiter = rateLimit({
 });
 
 import aiRouter from './routes/ai.routes.js';
+import emailRouter from './routes/email.routes.js';
 
 // Middlewares
 app.use(limiter);
@@ -58,6 +59,7 @@ app.use(express.json({ limit: '10mb' }));
 // Routes
 app.use('/api', mapRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/email', emailRouter);
 
 // Error Handling
 app.use(errorHandler);

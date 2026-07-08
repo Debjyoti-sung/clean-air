@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, MapPin, AlertTriangle } from 'lucide-react';
 import ProgressTracker from './ProgressTracker';
 import AIResolutionPanel from './AIResolutionPanel';
@@ -7,6 +7,9 @@ import EvidenceUpload from './EvidenceUpload';
 import FinalImplementation from './FinalImplementation';
 
 export default function ReportDrawer({ isOpen, onClose, report, setReports, readOnly = false }) {
+  const [imageFile, setImageFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+
   if (!isOpen || !report) return null;
 
   return (
@@ -157,16 +160,27 @@ export default function ReportDrawer({ isOpen, onClose, report, setReports, read
           </div>
         )}
 
-        {/* Evidence Upload for Completion */}
-        {report.aiResolutionPlan && (
-          <EvidenceUpload report={report} readOnly={readOnly} />
-        )}
+        {/* Evidence Upload */}
+        <EvidenceUpload 
+          report={report} 
+          readOnly={readOnly} 
+          imageFile={imageFile} 
+          setImageFile={setImageFile} 
+          pdfFile={pdfFile} 
+          setPdfFile={setPdfFile} 
+        />
 
       </div>
       
       {/* Footer / Final Action */}
       {!readOnly && (
-        <FinalImplementation report={report} onClose={onClose} setReports={setReports} />
+        <FinalImplementation 
+          report={report} 
+          onClose={onClose} 
+          setReports={setReports} 
+          imageFile={imageFile}
+          pdfFile={pdfFile}
+        />
       )}
     </div>
   );

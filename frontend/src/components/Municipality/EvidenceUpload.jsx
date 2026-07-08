@@ -1,9 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, FileUp, ShieldCheck } from 'lucide-react';
 
-export default function EvidenceUpload({ report, readOnly = false }) {
-  const [imageFile, setImageFile] = useState(null);
-  const [pdfFile, setPdfFile] = useState(null);
+export default function EvidenceUpload({ report, readOnly = false, imageFile, setImageFile, pdfFile, setPdfFile }) {
 
   const imageInputRef = useRef(null);
   const pdfInputRef = useRef(null);

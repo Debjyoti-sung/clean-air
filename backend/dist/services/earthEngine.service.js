@@ -16,9 +16,15 @@ async function initEarthEngine() {
     }
     isInitializing = true;
     try {
-        const keyPath = path.resolve('../api_json.json');
+        let keyPath = path.resolve('../api_json.json');
         if (!fs.existsSync(keyPath)) {
-            throw new Error('api_json.json not found in root directory');
+            const rootPath = path.resolve('api_json.json');
+            if (fs.existsSync(rootPath)) {
+                keyPath = rootPath;
+            }
+            else {
+                throw new Error('api_json.json not found in root directory or parent directory');
+            }
         }
         const privateKey = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
         await new Promise((resolve, reject) => {
@@ -31,7 +37,7 @@ async function initEarthEngine() {
                 }, (e) => {
                     isInitializing = false;
                     reject(new Error(`EE Initialization error: ${e}`));
-                }, null, privateKey.project_id);
+                });
             }, (e) => {
                 isInitializing = false;
                 reject(new Error(`EE Authentication error: ${e}`));
@@ -47,7 +53,7 @@ export const EarthEngineService = {
     /**
      * Fetch satellite-derived environmental data (NDVI, Elevation, etc)
      */
-    getSatelliteData: async (lat, lng) => {
+    getSatelliteData: async (lat, lng, bufferRange = 5000) => {
         try {
             await initEarthEngine();
             const point = ee.Geometry.Point([lng, lat]);
@@ -79,26 +85,56 @@ export const EarthEngineService = {
                         resolve(res);
                 });
             });
+            let thumbUrl = '';
+            try {
+                const rgbImage = s2.visualize({ bands: ['B4', 'B3', 'B2'], min: 0, max: 3000 });
+                const buffer = point.buffer(bufferRange); // Dynamic buffer range
+                thumbUrl = await new Promise((resolve, reject) => {
+                    rgbImage.getThumbURL({
+                        dimensions: 800,
+                        region: buffer,
+                        format: 'jpg'
+                    }, (url, err) => {
+                        if (err)
+                            reject(err);
+                        else
+                            resolve(url);
+                    });
+                });
+            }
+            catch (e) {
+                logger.warn('Could not generate GEE thumbnail: ' + (e.message || e));
+            }
             return {
                 ndvi: result.NDVI ? result.NDVI.toFixed(2) : '0.45',
                 elevation: result.elevation ? Math.round(result.elevation) + 'm' : 'Unknown',
                 fireHotspots: 0, // Requires complex FIRMS query, mocking 0 for safety
                 landCover: 'Urban/Built-up', // Requires landcover dataset classification
-                vegetationHealth: result.NDVI ? (result.NDVI > 0.4 ? 'Good' : 'Moderate') : 'Moderate'
+                vegetationHealth: result.NDVI ? (result.NDVI > 0.4 ? 'Good' : 'Moderate') : 'Moderate',
+                thumbUrl: thumbUrl || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'
             };
         }
         catch (error) {
-            logger.error('Google Earth Engine API request failed. Using fallback data:', error.message);
-            return getMockSatelliteData();
+            logger.error('Google Earth Engine API request failed. Using fallback data:', error.message || error);
+            return getMockSatelliteData(lat, lng, bufferRange);
         }
     }
 };
-function getMockSatelliteData() {
+function getMockSatelliteData(lat, lng, bufferRange = 5000) {
+    // Generate a live satellite image from ESRI World Imagery using a bounding box.
+    // 1 degree of latitude is ~111,000 meters.
+    const offset = bufferRange / 111000;
+    const minLng = (lng - offset).toFixed(4);
+    const minLat = (lat - offset).toFixed(4);
+    const maxLng = (lng + offset).toFixed(4);
+    const maxLat = (lat + offset).toFixed(4);
+    const esriUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${minLng},${minLat},${maxLng},${maxLat}&bboxSR=4326&imageSR=4326&size=800,800&format=jpg&f=image`;
     return {
         ndvi: (Math.random() * 0.5 + 0.2).toFixed(2), // 0.2 to 0.7
         fireHotspots: Math.random() > 0.8 ? Math.floor(Math.random() * 3) + 1 : 0,
         landCover: "Urban/Built-up",
         vegetationHealth: "Moderate",
-        elevation: Math.floor(Math.random() * 400 + 10) + "m"
+        elevation: Math.floor(Math.random() * 400 + 10) + "m",
+        thumbUrl: esriUrl
     };
 }
