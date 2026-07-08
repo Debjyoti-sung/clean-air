@@ -137,5 +137,46 @@ export const MapController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  /**
+   * Reverse Geocode coordinates to address
+   */
+  reverseGeocode: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { lat, lng } = req.query;
+
+      if (!lat || !lng) {
+        res.status(400).json({ error: 'Latitude and Longitude are required query parameters.' });
+        return;
+      }
+
+      const latitude = parseFloat(lat as string);
+      const longitude = parseFloat(lng as string);
+
+      if (isNaN(latitude) || isNaN(longitude)) {
+        res.status(400).json({ error: 'Latitude and Longitude must be valid numbers.' });
+        return;
+      }
+
+      // Check Cache
+      const cacheKey = `geocode_${latitude.toFixed(4)}_${longitude.toFixed(4)}`;
+      const cachedData = apiCache.get(cacheKey);
+
+      if (cachedData) {
+        res.status(200).json(cachedData);
+        return;
+      }
+
+      const { TomTomService } = await import('../services/tomtom.service.js');
+      const responseData = await TomTomService.reverseGeocode(latitude, longitude);
+
+      // Save to Cache
+      apiCache.set(cacheKey, responseData);
+
+      res.status(200).json(responseData);
+    } catch (error) {
+      next(error);
+    }
   }
 };

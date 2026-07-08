@@ -108,31 +108,21 @@ export default function LocationModal({ isOpen, onClose, language, selectedLocat
         const lngStr = longitude.toFixed(4);
 
         try {
-          // OpenStreetMap Nominatim Reverse Geocoding
+          // Precise Reverse Geocoding via our backend
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-            {
-              headers: {
-                'Accept-Language': 'en'
-              }
-            }
+            `https://clean-air-w252.onrender.com/api/reverse-geocode?lat=${latitude}&lng=${longitude}`
           );
 
-          if (!response.ok) throw new Error('Nominatim geocoding failed');
+          if (!response.ok) throw new Error('Geocoding failed');
 
           const geoData = await response.json();
-          const addr = geoData.address || {};
           
-          // Parse city, district, state
-          const city = addr.city || addr.town || addr.village || addr.suburb || addr.municipality || 'GPS Location';
-          const district = addr.county || addr.district || '';
-          const state = addr.state || 'India';
-          const country = addr.country || 'India';
-          const postcode = addr.postcode ? ` - ${addr.postcode}` : '';
-          
-          // Create a precise formatted address
-          const formattedAddress = geoData.display_name || 
-            `${geoData.name || ''}\n${addr.road || ''}\n${city}, ${district}\n${state}${postcode},\n${country}`;
+          // Parse values returned from our backend TomTom geocoding
+          const city = geoData.city || 'GPS Location';
+          const district = geoData.district || '';
+          const state = geoData.state || 'India';
+          const postcode = geoData.postcode ? ` - ${geoData.postcode}` : '';
+          const formattedAddress = geoData.address || `${city}, ${district}\n${state}${postcode}`;
 
           setSelectedLocation({
             source: 'GPS',

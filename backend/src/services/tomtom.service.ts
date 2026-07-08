@@ -56,8 +56,53 @@ export const TomTomService = {
       logger.error('TomTom API request failed. Falling back to mocks:', error.message);
       return getMockPOIs(lat, lng);
     }
+  },
+
+  /**
+   * Reverse geocode coordinates using TomTom Search
+   */
+  reverseGeocode: async (lat: number, lng: number): Promise<any> => {
+    const apiKey = process.env.TOMTOM_API_KEY;
+    if (!apiKey || apiKey.includes('xxx') || apiKey.includes('your_')) {
+      logger.warn('TomTom API Key is missing or default placeholder. Using mock address.');
+      return getMockAddress(lat, lng);
+    }
+
+    try {
+      const url = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lng}.json`;
+      const res = await axios.get(url, {
+        params: {
+          key: apiKey
+        },
+        timeout: 8000
+      });
+
+      const result = res.data?.addresses?.[0]?.address;
+      if (!result) throw new Error('No address found in TomTom response');
+
+      return {
+        address: result.freeformAddress || `${lat}, ${lng}`,
+        city: result.municipality || result.locality || 'GPS Location',
+        district: result.subMunicipality || result.municipalitySubdivision || '',
+        state: result.countrySubdivision || result.countrySubdivisionName || 'India',
+        postcode: result.postalCode || ''
+      };
+    } catch (error: any) {
+      logger.error('TomTom Reverse Geocode request failed. Falling back to mocks:', error.message);
+      return getMockAddress(lat, lng);
+    }
   }
 };
+
+function getMockAddress(lat: number, lng: number) {
+  return {
+    address: `GPS Telemetry Node Node-${Math.floor(lat * 100)},\nDetected Coordinates: [${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E],\nIndia`,
+    city: 'GPS Location',
+    district: '',
+    state: 'India',
+    postcode: ''
+  };
+}
 
 function getMockPOIs(lat: number, lng: number): Place[] {
   // We return empty instead of static identical data so that the frontend shows real API behavior

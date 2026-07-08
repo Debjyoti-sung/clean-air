@@ -12,4 +12,7 @@ router.get('/weather', MapController.getWeatherData);
 // Endpoint: GET /api/satellite?lat=...&lng=...
 router.get('/satellite', MapController.getSatelliteData);
 
+// Endpoint: GET /api/reverse-geocode?lat=...&lng=...
+router.get('/reverse-geocode', MapController.reverseGeocode);
+
 export default router;
