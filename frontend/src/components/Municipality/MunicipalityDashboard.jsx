@@ -54,6 +54,7 @@ export default function MunicipalityDashboard({ language, onBack, user }) {
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         isOpen={isSidebarOpen} 
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       />
       
       <div className={`flex-1 transition-all duration-300 flex flex-col h-screen relative z-10 w-full box-border ${isSidebarOpen ? 'pl-72' : 'pl-0'}`}>

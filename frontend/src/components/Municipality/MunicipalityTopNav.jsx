@@ -19,7 +19,7 @@ export default function MunicipalityTopNav({ onBack, user, setActiveTab, isSideb
       <div className="flex items-center space-x-4 md:space-x-8 w-1/2">
         <button 
           onClick={toggleSidebar}
-          className="p-2 rounded-full hover:bg-slate-200 text-slate-500 transition cursor-pointer flex-shrink-0"
+          className="p-2 bg-white rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 text-slate-700 transition cursor-pointer flex-shrink-0 flex items-center justify-center"
         >
           <Menu className="w-5 h-5" />
         </button>

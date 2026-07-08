@@ -9,10 +9,11 @@ import {
   Bell, 
   BarChart3, 
   Users, 
-  Settings 
+  Settings,
+  ChevronLeft
 } from 'lucide-react';
 
-export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen }) {
+export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen, toggleSidebar }) {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
     { name: 'Citizen Reports', icon: FileWarning },
@@ -29,18 +30,27 @@ export default function MunicipalitySidebar({ activeTab, setActiveTab, isOpen })
     <aside className={`w-72 bg-[#f1f5f9] h-screen fixed left-0 top-0 flex flex-col z-40 border-r border-slate-300/40 px-5 py-6 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       
       {/* Brand Logo Header */}
-      <div className="flex items-center space-x-3 mb-8 px-3">
-        <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] flex items-center justify-center text-lg">
-          🌿
+      <div className="flex items-center justify-between mb-8 px-3 relative">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-[#f1f5f9] shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] flex items-center justify-center text-lg">
+            🌿
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
+              Clean<span className="text-[#15803D]">Air</span>
+            </span>
+            <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">
+              Municipality
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <span className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
-            Clean<span className="text-[#15803D]">Air</span>
-          </span>
-          <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">
-            Municipality
-          </span>
-        </div>
+        <button 
+          onClick={toggleSidebar}
+          className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition cursor-pointer absolute -right-3"
+          title="Collapse Sidebar"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
       </div>
       
       {/* Segmented Neumorphic Sidebar Items */}
