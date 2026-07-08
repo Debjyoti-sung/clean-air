@@ -57,12 +57,12 @@ export default function FinalImplementation({ report, onClose, setReports, image
       setReports(prev => prev.map(r => r.id === report.id ? { ...r, currentStatus: 'Completed' } : r));
       
       // Show confirmation popup
-      alert('Resolution completed successfully! The confirmation email has been sent.');
+      alert('Information has sent! The email was successfully delivered and the resolution is complete.');
       
       onClose();
     } catch (error) {
       console.error('Error completing resolution:', error);
-      alert('Failed to complete resolution. Please try again later.');
+      alert('Information failed to send! Please check the email configuration or network connection.');
     } finally {
       setIsCompleting(false);
     }
