@@ -51,7 +51,7 @@ import emailRouter from './routes/email.routes.js';
 // Middlewares
 app.use(limiter);
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: '*', // Allow all origins for easier deployment (Vercel, Localhost, etc)
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));

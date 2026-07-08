@@ -33,7 +33,8 @@ export const EarthEngineService = {
           fireHotspots: Math.random() > 0.8 ? Math.floor(Math.random() * 3) + 1 : 0, 
           landCover: "Urban/Built-up",
           vegetationHealth: "Moderate",
-          elevation: Math.floor(Math.random() * 400 + 10) + "m"
+          elevation: Math.floor(Math.random() * 400 + 10) + "m",
+          thumbUrl: `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${(lng-0.045).toFixed(4)},${(lat-0.045).toFixed(4)},${(lng+0.045).toFixed(4)},${(lat+0.045).toFixed(4)}&bboxSR=4326&imageSR=4326&size=800,800&format=jpg&f=image`
         }
       };
     }
