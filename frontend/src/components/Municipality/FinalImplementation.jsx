@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { CheckCircle2, Lock, Loader2 } from 'lucide-react';
 
 export default function FinalImplementation({ report, onClose, setReports, imageFile, pdfFile }) {
-  const [isCompleting, setIsCompleting] = useState(false);
 
   if (report.currentStatus === 'Completed') {
     return (
@@ -20,52 +19,40 @@ export default function FinalImplementation({ report, onClose, setReports, image
   const hasEvidence = !!(imageFile && pdfFile);
   const canComplete = allTasksDone && hasEvidence;
   
-  const handleComplete = async () => {
-    setIsCompleting(true);
+  const handleComplete = () => {
+    // Show confirmation popup instantly
+    alert('Information has sent! The email is being delivered and the resolution is complete.');
 
-    try {
-      const formData = new FormData();
-      
-      const reportDetails = {
-        reportId: report.id,
-        issueCategory: report.issueCategory,
-        priority: report.priority,
-        wardNumber: report.wardNumber,
-        description: report.description,
-        aiResolutionPlan: report.aiResolutionPlan,
-        assignedOfficer: report.assignedOfficer,
-        citizenName: report.citizenName || 'Citizen'
-      };
+    // Update UI state immediately
+    setReports(prev => prev.map(r => r.id === report.id ? { ...r, currentStatus: 'Completed' } : r));
+    onClose();
 
-      formData.append('reportDetailsStr', JSON.stringify(reportDetails));
-      // Send the email to the requested address
-      formData.append('citizenEmail', 'debjyotibarikgdg@gmail.com');
+    // Trigger API call in the background
+    const formData = new FormData();
+    
+    const reportDetails = {
+      reportId: report.id,
+      issueCategory: report.issueCategory,
+      priority: report.priority,
+      wardNumber: report.wardNumber,
+      description: report.description,
+      aiResolutionPlan: report.aiResolutionPlan,
+      assignedOfficer: report.assignedOfficer,
+      citizenName: report.citizenName || 'Citizen'
+    };
 
-      if (imageFile) formData.append('imageFile', imageFile);
-      if (pdfFile) formData.append('pdfFile', pdfFile);
+    formData.append('reportDetailsStr', JSON.stringify(reportDetails));
+    formData.append('citizenEmail', 'debjyotibarikgdg@gmail.com');
 
-      // Force hitting the Node.js backend on port 5000
-      const response = await fetch(`https://clean-air-w252.onrender.com/api/email/send-resolution`, {
-        method: 'POST',
-        body: formData
-      });
+    if (imageFile) formData.append('imageFile', imageFile);
+    if (pdfFile) formData.append('pdfFile', pdfFile);
 
-      if (!response.ok) {
-        throw new Error('Failed to send resolution email');
-      }
-
-      setReports(prev => prev.map(r => r.id === report.id ? { ...r, currentStatus: 'Completed' } : r));
-      
-      // Show confirmation popup
-      alert('Information has sent! The email was successfully delivered and the resolution is complete.');
-      
-      onClose();
-    } catch (error) {
-      console.error('Error completing resolution:', error);
-      alert('Information failed to send! Please check the email configuration or network connection.');
-    } finally {
-      setIsCompleting(false);
-    }
+    fetch(`https://clean-air-w252.onrender.com/api/email/send-resolution`, {
+      method: 'POST',
+      body: formData
+    }).catch(error => {
+      console.error('Error sending resolution email in background:', error);
+    });
   };
 
   return (
@@ -89,11 +76,11 @@ export default function FinalImplementation({ report, onClose, setReports, image
 
       <button 
         onClick={handleComplete}
-        disabled={!canComplete || isCompleting}
+        disabled={!canComplete}
         className="w-full py-4 bg-[#15803D] hover:bg-[#166534] disabled:bg-slate-300 text-white font-black text-sm rounded-xl transition shadow-[0_4px_12px_rgba(21,128,61,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
       >
-        {isCompleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-        <span>{isCompleting ? 'Sending Notification & Completing...' : 'Complete Resolution'}</span>
+        <CheckCircle2 className="w-5 h-5" />
+        <span>Complete Resolution</span>
       </button>
     </div>
   );
